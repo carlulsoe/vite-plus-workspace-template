@@ -1,6 +1,11 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  run: {
+    cache: {
+      scripts: true,
+    },
+  },
   staged: {
     "*": "vp check --fix",
   },
