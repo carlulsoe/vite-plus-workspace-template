@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
-    "build": "tsc && vp build",
+    "build": "tsgo && vp build",
     "preview": "vp preview",
     "e2e": "playwright test",
     "test": "vp test"
@@ -46,6 +46,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@typescript/native-preview": "7.0.0-dev.20260309.1",
     "@vitejs/plugin-react": "catalog:",
     "jsdom": "catalog:",
     "typescript": "~5.9.3",
