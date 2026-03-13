@@ -1,29 +1,22 @@
-# Vite+ Monorepo Starter
+# Heaven Financial
 
-A starter for creating a Vite+ monorepo.
+A Vite+ monorepo that now uses a TanStack Start website with Nitro-backed routes and a shared
+market package.
 
 ## Development
 
-- Check everything is ready:
+- Run the development app:
+
+```bash
+vp run dev
+```
+
+- Validate the repo:
 
 ```bash
 vp run ready
 ```
 
-- Run the tests:
-
-```bash
-vp run test -r
-```
-
-- Build the monorepo:
-
-```bash
-vp run build -r
-```
-
-- Run the development server:
-
-```bash
-vp run dev
-```
+- Shared market logic lives in `packages/utils`, exported as `@heaven-financial/market`.
+- The website lives in `apps/website`.
+- The architectural layering note is in `docs/architecture/layering.md`.

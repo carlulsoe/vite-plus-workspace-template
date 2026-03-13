@@ -1,22 +1,15 @@
 {
-  "name": "utils",
+  "name": "@heaven-financial/market",
   "version": "0.0.0",
-  "description": "A starter for creating a TypeScript package.",
-  "homepage": "https://github.com/author/library#readme",
-  "bugs": {
-    "url": "https://github.com/author/library/issues"
-  },
+  "description": "Shared market snapshot and allocation services for Heaven Financial.",
   "license": "MIT",
-  "author": "Author Name <author.name@mail.com>",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/author/library.git"
-  },
+  "author": "Heaven Financial",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "type": "module",
-  "types": "./dist/index.d.mts",
+  "types": "./src/index.ts",
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
@@ -25,8 +18,7 @@
     "build": "vp pack",
     "dev": "vp pack --watch",
     "test": "vp test",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm run build"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^25.3.5",

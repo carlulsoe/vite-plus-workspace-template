@@ -1,23 +1,18 @@
-# tsdown-starter
+# @heaven-financial/market
 
-A starter for creating a TypeScript package.
+Shared market data, allocation planning, and operational health helpers for the Heaven Financial
+workspace.
 
 ## Development
 
-- Install dependencies:
+- Run the package tests:
 
 ```bash
-npm install
+vp test
 ```
 
-- Run the unit tests:
+- Build the package:
 
 ```bash
-npm run test
-```
-
-- Build the library:
-
-```bash
-npm run build
+vp pack
 ```
