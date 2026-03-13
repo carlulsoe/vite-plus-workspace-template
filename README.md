@@ -17,6 +17,13 @@ vp run dev
 vp run ready
 ```
 
+## Dev Container
+
+- Open the repo in a Dev Container to get Node 22, the global `vp` CLI, and
+  Chromium browser support for Playwright.
+- The container runs `CI=true vp install` on first create, so workspace
+  dependencies are installed without needing an interactive TTY.
+
 - Shared market logic lives in `packages/utils`, exported as `@heaven-financial/market`.
 - The website lives in `apps/website`.
 - The architectural layering note is in `docs/architecture/layering.md`.

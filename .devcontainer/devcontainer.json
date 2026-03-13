@@ -1,0 +1,28 @@
+{
+  "name": "Heaven Financial",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "root",
+  "updateRemoteUserUID": false,
+  "overrideCommand": false,
+  "runArgs": ["--init", "--ipc=host", "--security-opt=seccomp=unconfined"],
+  "postCreateCommand": "CI=true vp install",
+  "forwardPorts": [3000, 4173],
+  "portsAttributes": {
+    "3000": {
+      "label": "App dev server",
+      "onAutoForward": "notify"
+    },
+    "4173": {
+      "label": "Playwright test server",
+      "onAutoForward": "silent"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-playwright.playwright", "bradlc.vscode-tailwindcss"]
+    }
+  }
+}
