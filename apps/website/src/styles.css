@@ -264,6 +264,30 @@ select {
   text-transform: uppercase;
 }
 
+.primary-link,
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  border-radius: 999px;
+  padding: 0 1.2rem;
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.primary-link {
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  color: white;
+}
+
+.secondary-link {
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink);
+}
+
 .content-grid,
 .principles-grid,
 .score-grid,
@@ -504,6 +528,21 @@ select {
   justify-content: space-between;
 }
 
+.not-found-page {
+  padding: 3rem 0 4rem;
+}
+
+.not-found-card {
+  text-align: center;
+}
+
+.not-found-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
 .status-chip {
   font-size: 0.78rem;
   color: var(--positive);
@@ -557,6 +596,10 @@ select {
   .watchlist-row__metrics {
     justify-items: start;
     text-align: left;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
   }
 }
 

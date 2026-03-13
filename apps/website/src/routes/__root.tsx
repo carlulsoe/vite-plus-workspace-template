@@ -1,4 +1,5 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
@@ -24,6 +25,7 @@ export const Route = createRootRoute({
     links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: RootNotFound,
 });
 
 function RootDocument({ children }: { children: ReactNode }) {
@@ -40,5 +42,28 @@ function RootDocument({ children }: { children: ReactNode }) {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function RootNotFound() {
+  return (
+    <main className="page-shell not-found-page">
+      <section className="surface-card not-found-card">
+        <p className="eyebrow">Route not found</p>
+        <h1>The requested page is outside the current route tree.</h1>
+        <p className="hero-copy">
+          TanStack Router is now configured with an explicit root-level not found component, so bad
+          paths resolve to a real app surface instead of the default fallback.
+        </p>
+        <div className="not-found-actions">
+          <Link to="/" className="primary-link">
+            Return to dashboard
+          </Link>
+          <Link to="/status" className="secondary-link">
+            Open status page
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }
