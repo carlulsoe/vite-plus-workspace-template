@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+const isoTimestamp = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
+
 test("dashboard renders the primary market briefing surfaces", async ({ page }) => {
   await page.goto("/");
 
@@ -48,4 +50,26 @@ test("status page and health endpoint stay reachable", async ({ page, request })
   });
   expect(Array.isArray(body.checks)).toBe(true);
   expect(typeof body.checkedAt).toBe("string");
+});
+
+test("dashboard visual layout stays stable", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.locator("main")).toHaveScreenshot("dashboard-page.png", {
+    animations: "disabled",
+    caret: "hide",
+    maxDiffPixels: 100,
+    mask: [page.getByText(isoTimestamp)],
+  });
+});
+
+test("status visual layout stays stable", async ({ page }) => {
+  await page.goto("/status");
+
+  await expect(page.locator("main")).toHaveScreenshot("status-page.png", {
+    animations: "disabled",
+    caret: "hide",
+    maxDiffPixels: 100,
+    mask: [page.getByText(isoTimestamp)],
+  });
 });
