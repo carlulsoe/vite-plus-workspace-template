@@ -7,6 +7,9 @@
     "types": ["node", "vite/client"],
     "skipLibCheck": true,
     "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
