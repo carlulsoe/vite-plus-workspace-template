@@ -6,6 +6,12 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  fmt: {
+    ignorePatterns: ["src/routeTree.gen.ts"],
+  },
+  lint: {
+    ignorePatterns: ["src/routeTree.gen.ts"],
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

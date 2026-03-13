@@ -1,10 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { siteConfig } from "../config/site";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
 
-const navLinkClass =
-  "rounded-full px-4 py-2 text-sm font-semibold tracking-[0.02em] text-ink-soft transition hover:-translate-y-0.5 hover:bg-white/70 hover:text-ink";
+const navLinkClass = cn(
+  buttonVariants({ variant: "ghost", size: "sm" }),
+  "rounded-full px-4 text-sm tracking-[0.02em] text-ink-soft hover:-translate-y-0.5",
+);
 
-const navLinkActiveClass = `${navLinkClass} bg-white/80 text-ink shadow-sm`;
+const navLinkActiveClass = cn(
+  buttonVariants({ variant: "secondary", size: "sm" }),
+  "rounded-full px-4 text-sm tracking-[0.02em] text-ink shadow-sm",
+);
 
 export default function Header() {
   return (
@@ -15,13 +23,16 @@ export default function Header() {
             aria-hidden="true"
             className="h-4 w-4 rounded-full bg-[radial-gradient(circle_at_30%_30%,#f7d1bf,transparent_35%),linear-gradient(135deg,#c96c3c,#de9a53,#1f7460)] shadow-[0_0_0_6px_rgba(201,108,60,0.12)]"
           />
-          <span>
+          <span className="grid gap-1">
             <strong className="block text-base tracking-[0.01em] text-ink">
               {siteConfig.name}
             </strong>
-            <small className="block text-[0.72rem] uppercase tracking-[0.18em] text-ink-muted">
+            <Badge
+              variant="outline"
+              className="rounded-full px-2.5 py-0 text-[0.68rem] tracking-[0.18em] uppercase text-ink-muted"
+            >
               Morning allocation desk
-            </small>
+            </Badge>
           </span>
         </Link>
 
@@ -36,7 +47,15 @@ export default function Header() {
           >
             Status
           </Link>
-          <a href="/api/health" className={navLinkClass} target="_blank" rel="noreferrer">
+          <a
+            href="/api/health"
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "rounded-full px-4 text-sm tracking-[0.02em]",
+            )}
+            target="_blank"
+            rel="noreferrer"
+          >
             API Health
           </a>
         </nav>
