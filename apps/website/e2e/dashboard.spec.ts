@@ -1,0 +1,51 @@
+import { expect, test } from "@playwright/test";
+
+test("dashboard renders the primary market briefing surfaces", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page).toHaveTitle("Heaven Financial");
+  await expect(
+    page.getByRole("heading", {
+      name: "The market shell is no longer starter code.",
+    }),
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole("heading", {
+      level: 3,
+      name: "Balanced cross-asset mix with liquid macro optionality",
+    }),
+  ).toBeVisible();
+  await expect(page.getByText("operational", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Run scenario" })).toBeEnabled();
+  await expect(page.getByRole("heading", { level: 2, name: "Market posture" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "Brent Crude" })).toBeVisible();
+});
+
+test("status page and health endpoint stay reachable", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Status" }).click();
+
+  await expect(page).toHaveURL(/\/status$/);
+  await expect(
+    page.getByRole("heading", {
+      name: "Thin routes, shared package logic, live health surface.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByText("operational", { exact: true })).toBeVisible();
+
+  const response = await request.get("/api/health");
+
+  expect(response.ok()).toBe(true);
+
+  const body = await response.json();
+
+  expect(body).toMatchObject({
+    boundaryMode: "package-first",
+    packageCount: 1,
+    routeCount: 3,
+    status: "operational",
+  });
+  expect(Array.isArray(body.checks)).toBe(true);
+  expect(typeof body.checkedAt).toBe("string");
+});

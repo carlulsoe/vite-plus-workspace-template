@@ -6,6 +6,7 @@
   "scripts": {
     "ready": "vp fmt && vp lint && vp run test -r && vp run build -r",
     "dev": "vp run website#dev",
+    "e2e": "vp run website#e2e",
     "prepare": "vp config"
   },
   "devDependencies": {
