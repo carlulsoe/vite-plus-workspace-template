@@ -6,6 +6,19 @@ import { DashboardPage } from "./dashboard-page";
 import { siteConfig } from "../config/site";
 import { createDashboardData, createScenarioPlan } from "../lib/dashboard-data";
 
+const reactMocks = vi.hoisted(() => ({
+  startTransition: vi.fn((callback: () => void) => callback()),
+}));
+
+vi.mock("react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react")>();
+
+  return {
+    ...actual,
+    startTransition: reactMocks.startTransition,
+  };
+});
+
 vi.mock("lucide-react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("lucide-react")>();
   const createIcon = (name: string) => (props: Record<string, unknown>) => (
@@ -111,6 +124,7 @@ function submitScenario() {
 }
 
 afterEach(() => {
+  reactMocks.startTransition.mockClear();
   cleanup();
 });
 
@@ -153,6 +167,7 @@ describe("DashboardPage", () => {
 
     await screen.findByText(nextPlan.headline);
 
+    expect(reactMocks.startTransition).toHaveBeenCalledTimes(1);
     expect(runScenario).toHaveBeenCalledWith({
       profile: "acceleration",
       amount: 300_000,
@@ -259,20 +274,34 @@ describe("DashboardPage", () => {
 
   test("renders snapshot-driven content from the dashboard payload", async () => {
     const data = await createCompactDashboardData();
+    const currencyFormatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    });
+    const percentFormatter = new Intl.NumberFormat("en-US", {
+      signDisplay: "exceptZero",
+      maximumFractionDigits: 2,
+    });
 
     renderDashboard(data);
 
     expect(screen.getByText(data.health.boundaryMode)).toBeTruthy();
     expect(screen.getByText(data.snapshot.generatedAt)).toBeTruthy();
+    expect(screen.getAllByText("24h Change")).toHaveLength(data.snapshot.movers.length);
+    expect(screen.getAllByText("Allocation")).toHaveLength(data.defaultPlan.slices.length);
+    expect(screen.getAllByText("Read architecture")).toHaveLength(siteConfig.stackNotes.length);
 
     for (const badge of siteConfig.badges) {
       expect(screen.getByText(badge)).toBeTruthy();
     }
 
     const mover = data.snapshot.movers[0];
+    const moverCard = screen.getByText(`"${mover.note}"`).closest("[data-slot='card']");
     expect(screen.getAllByText(mover.label).length).toBeGreaterThan(0);
     expect(screen.getAllByText(mover.symbol).length).toBeGreaterThan(0);
     expect(screen.getByText(`"${mover.note}"`)).toBeTruthy();
+    expect(moverCard?.textContent).toContain(`${percentFormatter.format(mover.dayChangePct)}%`);
 
     const scorecardItem = data.snapshot.scorecard[0];
     expect(screen.getByText(scorecardItem.label)).toBeTruthy();
@@ -291,6 +320,17 @@ describe("DashboardPage", () => {
       ),
     ).toBeTruthy();
     expect(screen.getByText(instrument.value.toFixed(1))).toBeTruthy();
+
+    const watchlistRow = screen.getAllByText(instrument.label)[0]?.closest("div.group");
+    const watchlistPill = watchlistRow?.querySelector("div.inline-flex");
+
+    expect(watchlistPill?.textContent?.replace(/\s+/g, " ").trim()).toBe(
+      `↑ ${Math.abs(instrument.dayChangePct).toFixed(2)}%`,
+    );
+
+    const slice = data.defaultPlan.slices[0];
+    expect(screen.getByText(`${Math.round(slice.weight * 100)}%`)).toBeTruthy();
+    expect(screen.getByText(currencyFormatter.format(slice.amount))).toBeTruthy();
 
     for (const note of siteConfig.stackNotes) {
       expect(screen.getByText(note.title)).toBeTruthy();
@@ -337,39 +377,63 @@ describe("DashboardPage", () => {
     const negativeWatchRow = screen.getAllByText(negativeWatch!.label)[1]?.closest("div.group");
     const positiveWatchPill = positiveWatchRow?.querySelector("div.inline-flex");
     const negativeWatchPill = negativeWatchRow?.querySelector("div.inline-flex");
+    const positiveWatchPillText = positiveWatchPill?.textContent?.replace(/\s+/g, " ").trim();
+    const negativeWatchPillText = negativeWatchPill?.textContent?.replace(/\s+/g, " ").trim();
+    const positiveWatchChange = `${Math.abs(positiveWatch!.dayChangePct).toFixed(2)}%`;
+    const negativeWatchChange = `${Math.abs(negativeWatch!.dayChangePct).toFixed(2)}%`;
+    const positiveMoverChange = `${positiveWatch!.dayChangePct.toFixed(1)}%`;
+    const negativeMoverChange = `${negativeWatch!.dayChangePct.toFixed(1)}%`;
 
     expect(positiveScorecard?.className).toContain("card-positive");
+    expect(positiveScorecard?.className).not.toContain("card-negative");
+    expect(positiveScorecard?.className).not.toContain("card-steady");
     expect(
       positiveScorecard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
     ).toContain("text-emerald-500/40");
     expect(steadyScorecard?.className).toContain("card-steady");
+    expect(steadyScorecard?.className).not.toContain("card-positive");
+    expect(steadyScorecard?.className).not.toContain("card-negative");
     expect(
       steadyScorecard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
     ).toContain("text-sky-500/40");
     expect(negativeScorecard?.className).toContain("card-negative");
+    expect(negativeScorecard?.className).not.toContain("card-positive");
+    expect(negativeScorecard?.className).not.toContain("card-steady");
     expect(
       negativeScorecard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
     ).toContain("text-destructive/40");
 
     expect(positiveMoverCard?.querySelector("svg[data-icon='TrendingUp']")).toBeTruthy();
+    expect(positiveMoverCard?.querySelector("svg[data-icon='Activity']")).toBeNull();
     expect(
       positiveMoverCard?.querySelector("[class*='text-emerald-600'], [class*='text-emerald-400']"),
     ).toBeTruthy();
+    expect(positiveMoverCard?.textContent).toContain(`+${positiveMoverChange}`);
+    expect(positiveMoverCard?.querySelector("[class*='bg-emerald-500']")).toBeTruthy();
     expect(
       negativeMoverCard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
     ).toContain("rotate-180");
+    expect(negativeMoverCard?.querySelector("svg[data-icon='TrendingUp']")).toBeNull();
     expect(negativeMoverCard?.querySelector("[class*='text-destructive']")).toBeTruthy();
+    expect(negativeMoverCard?.textContent).toContain(negativeMoverChange);
+    expect(negativeMoverCard?.textContent).not.toContain(`+${negativeMoverChange}`);
+    expect(negativeMoverCard?.querySelector("[class*='bg-destructive']")).toBeTruthy();
 
-    expect(positiveWatchPill?.textContent).toContain("↑");
+    expect(positiveWatchPillText).toBe(`↑ ${positiveWatchChange}`);
     expect(positiveWatchPill?.className).toContain("text-emerald-600");
-    expect(negativeWatchPill?.textContent).toContain("↓");
+    expect(positiveWatchPill?.className).not.toContain("text-destructive");
+    expect(negativeWatchPillText).toBe(`↓ ${negativeWatchChange}`);
     expect(negativeWatchPill?.className).toContain("text-destructive");
+    expect(negativeWatchPill?.className).not.toContain("text-emerald-600");
 
     for (const [index, note] of siteConfig.stackNotes.entries()) {
-      const footerCard = screen.getByText(note.title).closest("[data-slot='card']");
+      const footerCard = screen.getByText(note.title).closest("[data-slot='card']") as HTMLElement;
       const iconName = index === 0 ? "Layers" : index === 1 ? "Cpu" : "Globe";
 
-      expect(footerCard?.querySelector(`svg[data-icon='${iconName}']`)).toBeTruthy();
+      expect(footerCard.querySelector(`svg[data-icon='${iconName}']`)).toBeTruthy();
+      expect(footerCard.querySelector("svg[data-icon='Layers']") !== null).toBe(index === 0);
+      expect(footerCard.querySelector("svg[data-icon='Cpu']") !== null).toBe(index === 1);
+      expect(footerCard.querySelector("svg[data-icon='Globe']") !== null).toBe(index === 2);
     }
 
     expect(container.querySelectorAll("svg[data-icon='ArrowRight']")).toHaveLength(

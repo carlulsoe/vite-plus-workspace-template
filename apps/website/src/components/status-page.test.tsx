@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { axe } from "vitest-axe";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import { StatusPage } from "./status-page";
@@ -60,18 +60,28 @@ describe("StatusPage", () => {
     expect(screen.getByRole("heading", { level: 2, name: /runtime signals/i })).toBeTruthy();
     expect(screen.getByText(/signal core snapshot/i)).toBeTruthy();
     expect(statusText.className).toContain("text-emerald-600");
+    expect(statusText.className).toContain("uppercase");
+    expect(statusText.className).toContain("tracking-[0.2em]");
     expect(statusPanel?.className).toContain("bg-emerald-500/10");
+    expect(statusPanel?.className).toContain("border-4");
     expect(pulseDot?.className).toContain("bg-emerald-500");
+    expect(pulseDot?.className).toContain("animate-pulse");
     expect(screen.queryByText(fullData.snapshot.watchlist[1]?.label ?? "")).toBeNull();
     expect((await axe(container)).violations).toHaveLength(0);
   });
 
   test("renders diagnostics, principles, and watchlist entries from the status payload", async () => {
     const data = await createStatusData();
-
-    render(<StatusPage data={data} />);
+    const { container } = render(<StatusPage data={data} />);
 
     expect(screen.getByText(`Last check: ${data.health.checkedAt}`)).toBeTruthy();
+    expect(container.querySelectorAll("div.absolute.top-0.left-0.w-1.h-full")).toHaveLength(
+      data.health.checks.length,
+    );
+    expect(screen.getAllByText("Principle")).toHaveLength(siteConfig.operatingPrinciples.length);
+    expect(container.querySelectorAll("svg[data-icon='ChevronRight']")).toHaveLength(
+      data.snapshot.watchlist.length,
+    );
 
     for (const check of data.health.checks) {
       expect(screen.getByText(check.label)).toBeTruthy();
@@ -110,6 +120,28 @@ describe("StatusPage", () => {
     expect(pulseDot?.className).toContain("bg-destructive");
   });
 
+  test("keeps operational styling for uppercase status values", async () => {
+    const data = await createCompactStatusData();
+    const uppercaseData = {
+      ...data,
+      health: {
+        ...data.health,
+        status: "OPERATIONAL" as never,
+      },
+    };
+
+    render(<StatusPage data={uppercaseData} />);
+
+    const statusText = screen.getByText("OPERATIONAL");
+    const statusPanel = statusText.parentElement;
+    const pulseDot = statusPanel?.querySelector("div.h-6.w-6");
+
+    expect(statusText.textContent).toBe("OPERATIONAL");
+    expect(statusText.className).toContain("text-emerald-600");
+    expect(statusPanel?.className).toContain("bg-emerald-500/10");
+    expect(pulseDot?.className).toContain("bg-emerald-500");
+  });
+
   test("uses the expected icon for each runtime check position", async () => {
     const data = await createStatusData();
     const extendedData = {
@@ -132,9 +164,17 @@ describe("StatusPage", () => {
     const iconNames = ["CheckCircle2", "Fingerprint", "Layers", "Activity"];
 
     for (const [index, check] of extendedData.health.checks.entries()) {
-      const card = screen.getByText(check.label).closest("[data-slot='card']");
+      const card = screen.getByText(check.label).closest("[data-slot='card']") as HTMLElement;
+      const cardScope = within(card);
 
-      expect(card?.querySelector(`svg[data-icon='${iconNames[index]}']`)).toBeTruthy();
+      expect(cardScope.getByText(check.detail)).toBeTruthy();
+      expect(card.querySelector(`svg[data-icon='${iconNames[index]}']`)).toBeTruthy();
+
+      for (const iconName of iconNames) {
+        expect(card.querySelector(`svg[data-icon='${iconName}']`) !== null).toBe(
+          iconName === iconNames[index],
+        );
+      }
     }
   });
 });

@@ -59,12 +59,19 @@ describe("Card", () => {
     );
 
     const card = screen.getByText("Header").closest("[data-slot='card']");
+    const header = screen.getByText("Header");
+    const content = screen.getByText("Content");
+    const footer = screen.getByText("Footer");
 
     expect(card).toBeTruthy();
     expect(card?.getAttribute("data-size")).toBe("sm");
     expect(card?.className).toContain("custom-card");
-    expect(screen.getByText("Header").className).toContain("custom-header");
-    expect(screen.getByText("Content").className).toContain("custom-content");
-    expect(screen.getByText("Footer").className).toContain("custom-footer");
+    expect(card?.className).toContain("data-[size=sm]:py-3");
+    expect(header.className).toContain("custom-header");
+    expect(header.className).toContain("group-data-[size=sm]/card:px-3");
+    expect(content.className).toContain("custom-content");
+    expect(content.className).toContain("group-data-[size=sm]/card:px-3");
+    expect(footer.className).toContain("custom-footer");
+    expect(footer.className).toContain("group-data-[size=sm]/card:p-3");
   });
 });

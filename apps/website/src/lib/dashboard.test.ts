@@ -79,12 +79,10 @@ describe("dashboard data boundary", () => {
       budget: 100_000,
     });
 
-    await expect(
-      createScenarioPlan({ profile: "balanced", amount: 100_000 }),
-    ).resolves.toMatchObject({
-      profile: "balanced",
-      totalBudget: 100_000,
-    });
+    const plan = await createScenarioPlan({ profile: "balanced", amount: 100_000 });
+
+    expect(plan.profile).toBe("balanced");
+    expect(plan.totalBudget).toBe(100_000);
   });
 
   test("rejects invalid profiles", () => {

@@ -68,6 +68,43 @@ describe("Field primitives", () => {
     expect(description?.className).toContain("text-muted-foreground");
   });
 
+  test("uses vertical orientation and legend styling by default", () => {
+    const { container } = render(
+      <FieldSet>
+        <FieldLegend>Default legend</FieldLegend>
+        <Field>
+          <FieldContent>Vertical field</FieldContent>
+        </Field>
+      </FieldSet>,
+    );
+
+    const legend = container.querySelector('[data-slot="field-legend"]');
+    const field = container.querySelector('[data-slot="field"]');
+
+    expect(legend?.getAttribute("data-variant")).toBe("legend");
+    expect(legend?.className).toContain("text-sm");
+    expect(field?.getAttribute("data-orientation")).toBe("vertical");
+    expect(field?.className).toContain("group/field");
+    expect(field?.className).toContain("flex-col");
+  });
+
+  test("renders horizontal orientation classes when requested", () => {
+    const { container } = render(
+      <Field orientation="horizontal">
+        <FieldLabel htmlFor="horizontal-input">Horizontal</FieldLabel>
+        <FieldContent>
+          <input id="horizontal-input" />
+        </FieldContent>
+      </Field>,
+    );
+
+    const field = container.querySelector('[data-slot="field"]');
+
+    expect(field?.getAttribute("data-orientation")).toBe("horizontal");
+    expect(field?.className).toContain("flex-row");
+    expect(field?.className).toContain("items-center");
+  });
+
   test("renders separator content only when children are provided", () => {
     const { container, rerender } = render(<FieldSeparator className="plain-separator" />);
 
@@ -150,5 +187,18 @@ describe("Field primitives", () => {
     expect(error?.getAttribute("role")).toBe("alert");
     expect(error?.textContent).toContain("Explicit content");
     expect(error?.textContent).not.toContain("Derived error");
+  });
+
+  test("updates derived error content when the errors prop changes", () => {
+    const { container, rerender } = render(<FieldError errors={[{ message: "First error" }]} />);
+
+    expect(container.textContent).toBe("First error");
+
+    rerender(<FieldError errors={[{ message: "Second error" }]} />);
+
+    const error = container.querySelector('[data-slot="field-error"]');
+
+    expect(error?.textContent).toBe("Second error");
+    expect(error?.className).toContain("text-destructive");
   });
 });

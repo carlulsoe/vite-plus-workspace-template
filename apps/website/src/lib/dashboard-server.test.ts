@@ -53,9 +53,11 @@ describe("dashboard server functions", () => {
 
     const dashboardModule = await import("./dashboard");
 
-    expect(mocks.createServerFn).toHaveBeenNthCalledWith(1, { method: "GET" });
-    expect(mocks.createServerFn).toHaveBeenNthCalledWith(2, { method: "GET" });
-    expect(mocks.createServerFn).toHaveBeenNthCalledWith(3, { method: "POST" });
+    expect(mocks.createServerFn.mock.calls).toEqual([
+      [{ method: "GET" }],
+      [{ method: "GET" }],
+      [{ method: "POST" }],
+    ]);
 
     const mockedGetDashboardData = dashboardModule.getDashboardData as unknown as {
       handler: () => Promise<typeof dashboardData>;
