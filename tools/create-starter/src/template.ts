@@ -82,10 +82,9 @@ function toTitleCase(name: string) {
 
 function replaceTemplateTokens(contents: string, projectSlug: string, projectTitle: string) {
   return [
-    ["@heaven-financial/market", `@${projectSlug}/market`],
-    ["@heaven-financial", `@${projectSlug}`],
-    ["Heaven Financial", projectTitle],
-    ["heaven-financial", projectSlug],
+    ["@vite-plus-workspace-template/core", `@${projectSlug}/core`],
+    ["Workspace Starter", projectTitle],
+    ["vite-plus-workspace-template", projectSlug],
   ].reduce(
     (currentContents, [searchValue, replaceValue]) =>
       currentContents.replaceAll(searchValue, replaceValue),
@@ -96,8 +95,8 @@ function replaceTemplateTokens(contents: string, projectSlug: string, projectTit
 function createGeneratedReadme(projectTitle: string, projectSlug: string) {
   return `# ${projectTitle}
 
-A Vite+ monorepo starter that uses a TanStack Start website with Nitro-backed routes and a shared
-workspace package.
+A Vite+ monorepo starter for workspace planning and delivery flows, built with TanStack Start,
+Nitro-backed routes, and a shared domain package.
 
 ## Development
 
@@ -116,7 +115,7 @@ dependencies are installed without needing an interactive TTY.
 ## Layout
 
 - The website lives in \`apps/website\`.
-- Shared domain logic lives in \`packages/utils\`, exported as \`@${projectSlug}/market\`.
+- Shared domain logic lives in \`packages/utils\`, exported as \`@${projectSlug}/core\`.
 - The architectural layering note is in \`docs/architecture/layering.md\`.
 `;
 }

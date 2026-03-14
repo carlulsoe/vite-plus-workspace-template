@@ -20,9 +20,9 @@ vp create github:<owner>/<repo> --directory my-new-app
 ```
 
 The generator path is the more complete option today because it rewrites the starter identity from
-`heaven-financial` / `Heaven Financial` / `@heaven-financial/market` to values derived from
-`--name`. The target directory is passed after `--` because it belongs to the underlying Bingo
-template, not Vite+'s builtin template flags.
+`vite-plus-workspace-template` / `Workspace Starter` / `@vite-plus-workspace-template/core` to
+values derived from `--name`. The target directory is passed after `--` because it belongs to the
+underlying Bingo template, not Vite+'s builtin template flags.
 
 ## Development
 
@@ -40,5 +40,5 @@ are installed without needing an interactive TTY.
 ## Layout
 
 - The website lives in `apps/website`.
-- Shared domain logic lives in `packages/utils`, exported as `@heaven-financial/market`.
+- Shared domain logic lives in `packages/utils`, exported as `@vite-plus-workspace-template/core`.
 - The architectural layering note is in `docs/architecture/layering.md`.

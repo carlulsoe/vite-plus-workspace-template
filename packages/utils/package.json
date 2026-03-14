@@ -1,9 +1,9 @@
 {
-  "name": "@heaven-financial/market",
+  "name": "@vite-plus-workspace-template/core",
   "version": "0.0.0",
-  "description": "Shared market snapshot and allocation services for Heaven Financial.",
+  "description": "Shared workspace planning services for the Vite+ workspace template.",
   "license": "MIT",
-  "author": "Heaven Financial",
+  "author": "Workspace Starter",
   "files": [
     "dist",
     "src"
@@ -11,7 +11,10 @@
   "type": "module",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

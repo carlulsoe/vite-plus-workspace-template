@@ -1,6 +1,6 @@
-# @heaven-financial/market
+# @vite-plus-workspace-template/core
 
-Shared market data, allocation planning, and operational health helpers for the Heaven Financial
+Shared workspace planning, dashboard snapshot, and operational health helpers for the template
 workspace.
 
 ## Development

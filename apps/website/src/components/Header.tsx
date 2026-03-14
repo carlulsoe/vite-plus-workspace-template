@@ -31,7 +31,7 @@ export default function Header() {
               variant="outline"
               className="rounded-full px-2.5 py-0 text-[0.68rem] tracking-[0.18em] uppercase text-ink-muted"
             >
-              Morning allocation desk
+              Shared core starter
             </Badge>
           </span>
         </Link>

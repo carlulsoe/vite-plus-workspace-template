@@ -5,7 +5,7 @@ below that so most regressions are caught before they need a full browser.
 
 ## Priorities
 
-1. Unit tests for shared market logic in `packages/utils`.
+1. Unit tests for shared planning logic in `packages/utils`.
 2. Integration tests for app-side server functions and API routes in `apps/website`.
 3. Route and component tests for critical UI state changes.
 4. Accessibility checks for key routes.
@@ -25,7 +25,7 @@ Focus:
 
 - sorting and selection of top movers
 - timestamp handling
-- allocation rounding and remainder handling
+- planning-budget rounding and remainder handling
 - profile-specific plan copy
 - health snapshot counts and check contents
 

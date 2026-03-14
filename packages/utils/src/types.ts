@@ -1,60 +1,60 @@
-export type AssetClass = "Rates" | "FX" | "Credit" | "Commodities" | "Equities";
+export type FocusArea = "Foundation" | "Product" | "Experience" | "Growth" | "Operations";
 
-export type SignalStrength = "Cooling" | "Balanced" | "Heating";
+export type SignalStrength = "Watch" | "Steady" | "Accelerating";
 
-export type AllocationProfile = "defensive" | "balanced" | "growth";
+export type PlanningProfile = "steady" | "balanced" | "acceleration";
 
-export interface MarketInstrument {
+export interface WorkspaceSignal {
   id: string;
   label: string;
   symbol: string;
-  assetClass: AssetClass;
-  price: number;
+  focusArea: FocusArea;
+  value: number;
   dayChangePct: number;
   monthChangePct: number;
   signal: SignalStrength;
-  thesis: string;
+  note: string;
 }
 
-export interface MarketScore {
+export interface SnapshotMetric {
   label: string;
   value: string;
   tone: "positive" | "steady" | "negative";
   detail: string;
 }
 
-export interface StrategyNote {
+export interface DeliveryNote {
   title: string;
   summary: string;
-  stance: "Overweight" | "Neutral" | "Hedge";
+  stance: "Prioritize" | "Maintain" | "Support";
 }
 
-export interface MarketSnapshot {
+export interface WorkspaceSnapshot {
   generatedAt: string;
-  movers: MarketInstrument[];
-  scorecard: MarketScore[];
-  strategyNotes: StrategyNote[];
-  watchlist: MarketInstrument[];
+  movers: WorkspaceSignal[];
+  scorecard: SnapshotMetric[];
+  deliveryNotes: DeliveryNote[];
+  watchlist: WorkspaceSignal[];
 }
 
-export interface RebalanceInput {
-  profile: AllocationProfile;
-  amount: number;
+export interface PlanningInput {
+  profile: PlanningProfile;
+  budget: number;
 }
 
-export interface AllocationSlice {
-  assetClass: AssetClass | "Cash";
+export interface BudgetSlice {
+  focusArea: FocusArea | "Reserve";
   weight: number;
   amount: number;
   rationale: string;
 }
 
-export interface RebalancePlan {
+export interface DeliveryPlan {
   headline: string;
   expectedRange: string;
-  investableAmount: number;
-  profile: AllocationProfile;
-  slices: AllocationSlice[];
+  totalBudget: number;
+  profile: PlanningProfile;
+  slices: BudgetSlice[];
 }
 
 export interface HealthCheck {

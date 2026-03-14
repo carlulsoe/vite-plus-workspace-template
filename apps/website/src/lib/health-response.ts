@@ -1,4 +1,4 @@
-import { createHealthSnapshot } from "@heaven-financial/market";
+import { createHealthSnapshot } from "@vite-plus-workspace-template/core";
 
 export async function createHealthRouteResponse() {
   return new Response(JSON.stringify(createHealthSnapshot()), {

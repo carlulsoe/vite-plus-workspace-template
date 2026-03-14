@@ -2,7 +2,7 @@
   "name": "create-starter",
   "version": "0.0.0",
   "private": true,
-  "description": "Scaffold the Heaven Financial Vite+ starter as a reusable project template.",
+  "description": "Scaffold the Workspace Starter Vite+ monorepo as a reusable project template.",
   "keywords": [
     "tanstack-start",
     "vite-plus-generator",

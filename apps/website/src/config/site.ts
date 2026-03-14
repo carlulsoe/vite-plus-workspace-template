@@ -1,18 +1,24 @@
 export const siteConfig = {
-  name: "Heaven Financial",
-  description:
-    "An editorial market briefing built on TanStack Start, Nitro, and a shared domain package.",
-  footerTagline: "Package-first market logic with Nitro-backed routes",
-  badges: ["TanStack Start", "Nitro", "Rates", "FX", "Credit", "Commodities"],
+  name: "Workspace Starter",
+  description: "A generic Vite+ starter built on TanStack Start, Nitro, and a shared core package.",
+  footerTagline: "Package-first planning logic with Nitro-backed routes",
+  badges: [
+    "TanStack Start",
+    "Nitro",
+    "Shared Core",
+    "Budget Scenarios",
+    "Health Checks",
+    "Workspace Package",
+  ],
   operatingPrinciples: [
-    "Keep market logic in workspace packages and keep routes thin.",
+    "Keep shared planning logic in workspace packages and keep routes thin.",
     "Expose operational health early with status pages and machine-readable endpoints.",
-    "Favor reusable allocation services over one-off UI calculations.",
+    "Favor reusable planning services over one-off UI calculations.",
   ],
   stackNotes: [
     {
-      title: "Shared Market Package",
-      copy: "The dashboard reads its market snapshot and allocation plans from a workspace package instead of local component glue.",
+      title: "Shared Core Package",
+      copy: "The dashboard reads its signals and planning scenarios from a workspace package instead of local component glue.",
     },
     {
       title: "Nitro Handlers",

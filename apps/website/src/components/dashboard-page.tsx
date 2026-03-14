@@ -1,8 +1,8 @@
 import {
-  type AllocationProfile,
-  type MarketInstrument,
-  type RebalancePlan,
-} from "@heaven-financial/market";
+  type DeliveryPlan,
+  type PlanningProfile,
+  type WorkspaceSignal,
+} from "@vite-plus-workspace-template/core";
 import { startTransition, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -39,19 +39,19 @@ const sectionBadgeClass =
 export interface DashboardPageProps {
   data: DashboardData;
   invalidate?: () => void | Promise<void>;
-  runScenario: (input: { profile: AllocationProfile; amount: number }) => Promise<RebalancePlan>;
+  runScenario: (input: { profile: PlanningProfile; amount: number }) => Promise<DeliveryPlan>;
 }
 
 export function DashboardPage({ data, invalidate, runScenario }: DashboardPageProps) {
   const { defaultPlan, health, snapshot } = data;
-  const [plan, setPlan] = useState<RebalancePlan>(defaultPlan);
+  const [plan, setPlan] = useState<DeliveryPlan>(defaultPlan);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   function handleSubmit(formData: FormData) {
     const rawProfile = formData.get("profile");
     const rawAmount = formData.get("amount");
-    const profile = typeof rawProfile === "string" ? (rawProfile as AllocationProfile) : "balanced";
+    const profile = typeof rawProfile === "string" ? (rawProfile as PlanningProfile) : "balanced";
     const amount = typeof rawAmount === "string" ? Number(rawAmount) : 0;
 
     setError(null);
@@ -65,7 +65,9 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
         })
         .catch((caughtError) => {
           setError(
-            caughtError instanceof Error ? caughtError.message : "Unable to price the scenario.",
+            caughtError instanceof Error
+              ? caughtError.message
+              : "Unable to recompute the scenario.",
           );
         })
         .finally(() => {
@@ -80,14 +82,14 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
         <CardContent className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,0.8fr)]">
           <div>
             <Badge variant="outline" className={sectionBadgeClass}>
-              Cross-asset morning brief
+              Workspace planning starter
             </Badge>
             <h1 className="mt-3 font-display text-5xl leading-[0.92] tracking-[-0.04em] text-ink sm:text-7xl">
-              The market shell is no longer starter code.
+              A starter dashboard with a real domain model.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-ink-soft sm:text-lg">
               This app now runs as a TanStack Start application with Nitro-backed routes and a
-              shared market package. The dashboard and scenario engine are both reading from the
+              shared core package. The planning surface and status view are both reading from the
               same domain API.
             </p>
           </div>
@@ -95,7 +97,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
           <Card className="rounded-[1.6rem] border border-black/10 bg-[linear-gradient(160deg,rgba(17,97,73,0.09),transparent_44%),rgba(253,250,245,0.72)] py-0">
             <CardContent className="flex h-full flex-col justify-between gap-4 p-6">
               <Badge variant="outline" className={sectionBadgeClass}>
-                Desk health
+                System health
               </Badge>
               <strong className="text-3xl capitalize text-ink">{health.status}</strong>
               <p className="text-sm text-ink-soft">{health.boundaryMode}</p>
@@ -123,10 +125,10 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
             <CardHeader className="px-6 pt-6">
               <div>
                 <Badge variant="outline" className={sectionBadgeClass}>
-                  Market tape
+                  Snapshot feed
                 </Badge>
                 <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-                  Highest-conviction movers
+                  Active work signals
                 </h2>
               </div>
               <CardAction className="text-sm font-semibold text-ink-muted">
@@ -145,10 +147,10 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
             <CardHeader className="px-6 pt-6">
               <div>
                 <Badge variant="outline" className={sectionBadgeClass}>
-                  Allocation engine
+                  Planning engine
                 </Badge>
                 <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-                  Scenario rebalance
+                  Budget scenario
                 </h2>
               </div>
               <CardAction className="text-sm font-semibold text-ink-muted">
@@ -165,18 +167,18 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
               >
                 <FieldGroup className="mt-1 gap-4 lg:grid lg:grid-cols-3 lg:items-end">
                   <Field>
-                    <FieldLabel htmlFor="profile">Profile</FieldLabel>
+                    <FieldLabel htmlFor="profile">Delivery profile</FieldLabel>
                     <FieldContent>
                       <NativeSelect id="profile" name="profile" defaultValue={plan.profile}>
-                        <NativeSelectOption value="defensive">Defensive</NativeSelectOption>
+                        <NativeSelectOption value="steady">Steady</NativeSelectOption>
                         <NativeSelectOption value="balanced">Balanced</NativeSelectOption>
-                        <NativeSelectOption value="growth">Growth</NativeSelectOption>
+                        <NativeSelectOption value="acceleration">Acceleration</NativeSelectOption>
                       </NativeSelect>
                     </FieldContent>
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="amount">Investable capital</FieldLabel>
+                    <FieldLabel htmlFor="amount">Planning budget</FieldLabel>
                     <FieldContent>
                       <Input
                         id="amount"
@@ -185,7 +187,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                         type="number"
                         min="100000"
                         step="50000"
-                        defaultValue={plan.investableAmount}
+                        defaultValue={plan.totalBudget}
                       />
                     </FieldContent>
                   </Field>
@@ -198,7 +200,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                       disabled={pending}
                     >
                       {pending ? <Spinner data-icon="inline-start" /> : null}
-                      {pending ? "Repricing..." : "Run scenario"}
+                      {pending ? "Recomputing..." : "Run scenario"}
                     </Button>
                   </Field>
                 </FieldGroup>
@@ -209,7 +211,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                   variant="destructive"
                   className="mt-4 rounded-2xl border-destructive/20 bg-destructive/10 px-4 py-3"
                 >
-                  <AlertTitle>Scenario pricing failed</AlertTitle>
+                  <AlertTitle>Scenario update failed</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               ) : null}
@@ -217,7 +219,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <Badge variant="outline" className={sectionBadgeClass}>
-                    Recommended mix
+                    Recommended split
                   </Badge>
                   <h3 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
                     {plan.headline}
@@ -233,10 +235,10 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
 
               <div className="mt-5 grid gap-3">
                 {plan.slices.map((slice) => (
-                  <Card key={slice.assetClass} size="sm" className={nestedCardClass}>
+                  <Card key={slice.focusArea} size="sm" className={nestedCardClass}>
                     <CardContent className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <strong className="text-base text-ink">{slice.assetClass}</strong>
+                        <strong className="text-base text-ink">{slice.focusArea}</strong>
                         <p className="mt-1 text-sm leading-7 text-ink-soft">{slice.rationale}</p>
                       </div>
                       <div className="grid gap-1 sm:justify-items-end sm:text-right">
@@ -264,11 +266,11 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                   Scoreboard
                 </Badge>
                 <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-                  Market posture
+                  Delivery posture
                 </h2>
               </div>
               <CardAction className="text-sm font-semibold text-ink-muted">
-                Shared package service
+                Shared core service
               </CardAction>
             </CardHeader>
 
@@ -305,10 +307,10 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
             <CardHeader className="px-6 pt-6">
               <div>
                 <Badge variant="outline" className={sectionBadgeClass}>
-                  Desk notes
+                  Working notes
                 </Badge>
                 <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-                  Watchlist and operating stance
+                  Signals and operating stance
                 </h2>
               </div>
               <CardAction className="text-sm font-semibold text-ink-muted">
@@ -324,7 +326,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                       <div>
                         <strong className="text-base text-ink">{instrument.label}</strong>
                         <p className="mt-1 text-sm text-ink-soft">
-                          {instrument.symbol} · {instrument.assetClass}
+                          {instrument.symbol} · {instrument.focusArea}
                         </p>
                       </div>
                       <div className="grid gap-1 sm:justify-items-end sm:text-right">
@@ -332,7 +334,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                           variant="outline"
                           className="justify-self-start rounded-full px-2.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-ink-muted sm:justify-self-end"
                         >
-                          {instrument.price.toFixed(2)}
+                          {instrument.value.toFixed(1)}
                         </Badge>
                         <strong className={getDayChangeClass(instrument.dayChangePct)}>
                           {percentFormatter.format(instrument.dayChangePct)}%
@@ -346,7 +348,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
               <Separator className="my-5 bg-black/8" />
 
               <div className="grid gap-3">
-                {snapshot.strategyNotes.map((note) => (
+                {snapshot.deliveryNotes.map((note) => (
                   <Card
                     key={note.title}
                     size="sm"
@@ -386,7 +388,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
   );
 }
 
-function MoverCard({ instrument }: { instrument: MarketInstrument }) {
+function MoverCard({ instrument }: { instrument: WorkspaceSignal }) {
   return (
     <Card className="min-h-56 rounded-[1.4rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(249,243,234,0.82))] py-0 shadow-panel">
       <CardContent className="px-5 py-5">
@@ -395,7 +397,7 @@ function MoverCard({ instrument }: { instrument: MarketInstrument }) {
             variant="outline"
             className="rounded-full px-2.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-ink-muted"
           >
-            {instrument.assetClass}
+            {instrument.focusArea}
           </Badge>
           <strong className={getDayChangeClass(instrument.dayChangePct)}>
             {percentFormatter.format(instrument.dayChangePct)}%
@@ -407,7 +409,7 @@ function MoverCard({ instrument }: { instrument: MarketInstrument }) {
         <p className="mt-2 text-[0.82rem] font-bold uppercase tracking-[0.12em] text-ink-soft">
           {instrument.symbol}
         </p>
-        <p className="mt-3 text-sm leading-7 text-ink-soft">{instrument.thesis}</p>
+        <p className="mt-3 text-sm leading-7 text-ink-soft">{instrument.note}</p>
       </CardContent>
     </Card>
   );

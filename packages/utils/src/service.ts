@@ -1,72 +1,67 @@
-import {
-  allocationRationales,
-  allocationTargets,
-  baselineScorecard,
-  strategyNotes,
-} from "./config";
-import { marketWatchlist } from "./repo";
-import type { HealthSnapshot, MarketSnapshot, RebalanceInput, RebalancePlan } from "./types";
+import { baselineScorecard, deliveryNotes, planningRationales, planningTargets } from "./config";
+import { workspaceSignals } from "./repo";
+import type { DeliveryPlan, HealthSnapshot, PlanningInput, WorkspaceSnapshot } from "./types";
 
 function sortByAbsoluteMove() {
-  return [...marketWatchlist].sort(
+  return [...workspaceSignals].sort(
     (left, right) => Math.abs(right.dayChangePct) - Math.abs(left.dayChangePct),
   );
 }
 
-function planHeadline(profile: RebalanceInput["profile"]) {
+function planHeadline(profile: PlanningInput["profile"]) {
   switch (profile) {
-    case "defensive":
-      return "Defensive carry with duration ballast";
-    case "growth":
-      return "Growth-tilted allocation with hard hedges intact";
+    case "steady":
+      return "Steady delivery plan with protected platform work";
+    case "acceleration":
+      return "Acceleration plan with core operations protected";
     default:
-      return "Balanced cross-asset mix with liquid macro optionality";
+      return "Balanced roadmap across product, platform, and growth";
   }
 }
 
-function planRange(profile: RebalanceInput["profile"]) {
+function planRange(profile: PlanningInput["profile"]) {
   switch (profile) {
-    case "defensive":
-      return "Expected annualized drawdown: 5% to 8%";
-    case "growth":
-      return "Expected annualized drawdown: 11% to 15%";
+    case "steady":
+      return "Expected coordination load: low to moderate";
+    case "acceleration":
+      return "Expected coordination load: moderate to high";
     default:
-      return "Expected annualized drawdown: 8% to 11%";
+      return "Expected coordination load: moderate";
   }
 }
 
-export function createMarketSnapshot(asOf = new Date()): MarketSnapshot {
+export function createWorkspaceSnapshot(asOf = new Date()): WorkspaceSnapshot {
   return {
     generatedAt: asOf.toISOString(),
     movers: sortByAbsoluteMove().slice(0, 3),
     scorecard: baselineScorecard,
-    strategyNotes,
-    watchlist: marketWatchlist,
+    deliveryNotes,
+    watchlist: workspaceSignals,
   };
 }
 
-export function createRebalancePlan(input: RebalanceInput): RebalancePlan {
-  const weights = allocationTargets[input.profile];
+export function createDeliveryPlan(input: PlanningInput): DeliveryPlan {
+  const weights = planningTargets[input.profile];
   const entries = Object.entries(weights) as Array<[keyof typeof weights, number]>;
   let assigned = 0;
 
-  const slices = entries.map(([assetClass, weight], index) => {
+  const slices = entries.map(([focusArea, weight], index) => {
     const isLast = index === entries.length - 1;
-    const amount = isLast ? input.amount - assigned : Math.round(input.amount * weight);
+    const amount = isLast ? input.budget - assigned : Math.round(input.budget * weight);
     assigned += amount;
 
     return {
-      assetClass,
+      focusArea,
       weight,
       amount,
-      rationale: allocationRationales[assetClass],
+      rationale: planningRationales[focusArea],
     };
   });
 
   return {
     headline: planHeadline(input.profile),
     expectedRange: planRange(input.profile),
-    investableAmount: input.amount,
+    totalBudget: input.budget,
     profile: input.profile,
     slices,
   };
@@ -81,9 +76,9 @@ export function createHealthSnapshot(asOf = new Date()): HealthSnapshot {
     routeCount: 3,
     checks: [
       {
-        label: "Market package",
+        label: "Core package",
         detail:
-          "Shared watchlist and allocation services resolve from the workspace package entrypoint.",
+          "Shared signals and planning services resolve from the workspace package entrypoint.",
         state: "pass",
       },
       {

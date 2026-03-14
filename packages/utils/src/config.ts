@@ -1,86 +1,88 @@
 import type {
-  AllocationProfile,
-  AllocationSlice,
-  AssetClass,
-  MarketScore,
-  StrategyNote,
+  BudgetSlice,
+  DeliveryNote,
+  FocusArea,
+  PlanningProfile,
+  SnapshotMetric,
 } from "./types";
 
-type AllocationTargetMap = Record<AllocationProfile, Record<AssetClass | "Cash", number>>;
+type PlanningTargetMap = Record<PlanningProfile, Record<FocusArea | "Reserve", number>>;
 
-export const allocationTargets: AllocationTargetMap = {
-  defensive: {
-    Rates: 0.3,
-    Credit: 0.24,
-    FX: 0.12,
-    Commodities: 0.1,
-    Equities: 0.14,
-    Cash: 0.1,
+export const planningTargets: PlanningTargetMap = {
+  steady: {
+    Foundation: 0.28,
+    Product: 0.24,
+    Experience: 0.14,
+    Growth: 0.1,
+    Operations: 0.14,
+    Reserve: 0.1,
   },
   balanced: {
-    Rates: 0.24,
-    Credit: 0.22,
-    FX: 0.11,
-    Commodities: 0.13,
-    Equities: 0.22,
-    Cash: 0.08,
+    Foundation: 0.22,
+    Product: 0.26,
+    Experience: 0.18,
+    Growth: 0.14,
+    Operations: 0.12,
+    Reserve: 0.08,
   },
-  growth: {
-    Rates: 0.14,
-    Credit: 0.18,
-    FX: 0.13,
-    Commodities: 0.14,
-    Equities: 0.33,
-    Cash: 0.08,
+  acceleration: {
+    Foundation: 0.18,
+    Product: 0.32,
+    Experience: 0.18,
+    Growth: 0.18,
+    Operations: 0.08,
+    Reserve: 0.06,
   },
 };
 
-export const allocationRationales: Record<AllocationSlice["assetClass"], string> = {
-  Rates: "Anchor portfolio duration while inflation momentum cools without breaking.",
-  Credit: "Harvest carry where spreads still pay for slower growth risk.",
-  FX: "Keep dry powder in liquid macro expressions for policy divergence.",
-  Commodities: "Hold inflation and shipping hedges where supply remains constrained.",
-  Equities: "Stay exposed to upside beta, but only where earnings breadth is improving.",
-  Cash: "Preserve optionality for repricing windows and deployment on dislocations.",
+export const planningRationales: Record<BudgetSlice["focusArea"], string> = {
+  Foundation: "Protect routing, auth, and shared platform work so product delivery stays stable.",
+  Product: "Fund the roadmap where customer value and learning loops are strongest.",
+  Experience:
+    "Keep polish, accessibility, and usability work visible instead of treating it as overflow.",
+  Growth: "Reserve room for onboarding, experimentation, and conversion improvements.",
+  Operations: "Sustain the workflows that keep launches, support, and incident response reliable.",
+  Reserve: "Hold capacity for surprises, regressions, and work discovered during delivery.",
 };
 
-export const baselineScorecard: MarketScore[] = [
+export const baselineScorecard: SnapshotMetric[] = [
   {
-    label: "Risk Pulse",
-    value: "62",
+    label: "Delivery Confidence",
+    value: "72",
     tone: "positive",
-    detail: "Broad risk appetite is constructive, but leadership is narrow.",
+    detail: "The current plan has healthy momentum and dependencies are visible early.",
   },
   {
-    label: "Liquidity",
-    value: "Tight",
+    label: "Platform Health",
+    value: "Stable",
     tone: "steady",
-    detail: "Funding is orderly, though overnight conditions still demand respect.",
+    detail: "Core foundations are supporting feature work without creating daily drag.",
   },
   {
-    label: "Carry",
-    value: "+148bp",
+    label: "Experiment Velocity",
+    value: "6 live",
     tone: "positive",
-    detail: "Credit and rates still compensate patient capital.",
+    detail: "The team is still creating space for iteration while keeping the roadmap intact.",
   },
 ];
 
-export const strategyNotes: StrategyNote[] = [
+export const deliveryNotes: DeliveryNote[] = [
   {
-    title: "Favor curve quality over pure beta",
+    title: "Protect foundation work while shipping",
     summary:
-      "Duration is useful again, but ladder exposure rather than reaching for one macro call.",
-    stance: "Overweight",
+      "Shared infrastructure should move in lockstep with product delivery, not as a cleanup phase.",
+    stance: "Prioritize",
   },
   {
-    title: "Keep commodities as policy insurance",
+    title: "Keep operations visible in the plan",
     summary:
-      "Energy and metals still diversify the portfolio if inflation reaccelerates unexpectedly.",
-    stance: "Hedge",
+      "Automation, incident response, and support tooling should be budgeted explicitly instead of borrowed from feature time.",
+    stance: "Maintain",
   },
   {
-    title: "Use FX as the cleanest expression layer",
-    summary: "Rates and equities both carry balance sheet noise; major FX crosses stay cleaner.",
-    stance: "Neutral",
+    title: "Use growth work to validate the roadmap",
+    summary:
+      "Onboarding and activation experiments should sharpen product decisions, not run in a separate silo.",
+    stance: "Support",
   },
 ];

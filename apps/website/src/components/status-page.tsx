@@ -13,7 +13,7 @@ export function StatusPage({ data }: StatusPageProps) {
   const { health, snapshot } = data;
   const healthBadgeClass = cn(
     "rounded-full px-4 py-2 text-[0.82rem] font-extrabold uppercase tracking-[0.08em]",
-    health.status.toLowerCase() === "healthy"
+    health.status.toLowerCase() === "operational"
       ? "border-emerald-700/20 bg-emerald-500/10 text-emerald-900"
       : "border-destructive/20 bg-destructive/10 text-destructive",
   );
@@ -119,14 +119,14 @@ export function StatusPage({ data }: StatusPageProps) {
               variant="outline"
               className="rounded-full px-3 py-1 text-[0.68rem] uppercase tracking-[0.18em] text-ink-muted"
             >
-              Watchlist footprint
+              Signal footprint
             </Badge>
             <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-              Current package snapshot
+              Current core snapshot
             </h2>
           </div>
           <CardAction className="text-sm font-semibold text-ink-muted">
-            {snapshot.watchlist.length} instruments
+            {snapshot.watchlist.length} signals
           </CardAction>
         </CardHeader>
         <CardContent className="grid gap-3 px-6 pb-6">
@@ -136,7 +136,7 @@ export function StatusPage({ data }: StatusPageProps) {
               <div className="flex flex-col gap-3 rounded-[1.15rem] border border-black/10 bg-white/55 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <strong className="text-base text-ink">{instrument.label}</strong>
-                  <p className="mt-1 text-sm leading-7 text-ink-soft">{instrument.thesis}</p>
+                  <p className="mt-1 text-sm leading-7 text-ink-soft">{instrument.note}</p>
                 </div>
                 <div className="grid gap-1 sm:justify-items-end sm:text-right">
                   <Badge

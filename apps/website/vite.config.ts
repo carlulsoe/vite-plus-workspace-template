@@ -17,7 +17,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@heaven-financial/market": fileURLToPath(
+      "@vite-plus-workspace-template/core": fileURLToPath(
         new URL("../../packages/utils/src/index.ts", import.meta.url),
       ),
     },
