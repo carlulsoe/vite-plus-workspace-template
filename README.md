@@ -1,29 +1,44 @@
-# Heaven Financial
+# Vite+ Starter Workspace
 
-A Vite+ monorepo that now uses a TanStack Start website with Nitro-backed routes and a shared
-market package.
+This repository is now structured to serve two roles:
+
+- a working Vite+ monorepo for exploring TanStack Start, Nitro, and shared workspace packages
+- a local template source through `tools/create-starter`
+
+## Use It As A Template
+
+Local generator:
+
+```bash
+vp create create-starter -- --directory my-new-app --name my-new-app
+```
+
+GitHub template:
+
+```bash
+vp create github:<owner>/<repo> --directory my-new-app
+```
+
+The generator path is the more complete option today because it rewrites the starter identity from
+`heaven-financial` / `Heaven Financial` / `@heaven-financial/market` to values derived from
+`--name`. The target directory is passed after `--` because it belongs to the underlying Bingo
+template, not Vite+'s builtin template flags.
 
 ## Development
 
-- Run the development app:
-
 ```bash
 vp run dev
-```
-
-- Validate the repo:
-
-```bash
 vp run ready
 ```
 
 ## Dev Container
 
-- Open the repo in a Dev Container to get Node 22, the global `vp` CLI, and
-  Chromium browser support for Playwright.
-- The container runs `CI=true vp install` on first create, so workspace
-  dependencies are installed without needing an interactive TTY.
+Open the repo in a Dev Container to get Node 22, the global `vp` CLI, and Chromium browser support
+for Playwright. The container runs `CI=true vp install` on first create, so workspace dependencies
+are installed without needing an interactive TTY.
 
-- Shared market logic lives in `packages/utils`, exported as `@heaven-financial/market`.
+## Layout
+
 - The website lives in `apps/website`.
+- Shared domain logic lives in `packages/utils`, exported as `@heaven-financial/market`.
 - The architectural layering note is in `docs/architecture/layering.md`.

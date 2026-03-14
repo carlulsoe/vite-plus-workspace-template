@@ -1,0 +1,28 @@
+{
+  "name": "create-starter",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Scaffold the Heaven Financial Vite+ starter as a reusable project template.",
+  "keywords": [
+    "tanstack-start",
+    "vite-plus-generator",
+    "workspace-template"
+  ],
+  "bin": "./bin/index.ts",
+  "type": "module",
+  "scripts": {
+    "test": "vp test",
+    "dev": "node bin/index.ts"
+  },
+  "dependencies": {
+    "bingo": "^0.7.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
