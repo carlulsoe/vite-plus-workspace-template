@@ -120,5 +120,4 @@ Run the current mutation target with:
 vp run mutate
 ```
 
-The initial Stryker setup is intentionally scoped to `packages/utils` so mutation runs stay quick
-enough to use while evolving the starter.
+It currently tests a lot and takes on average 15 min to run.

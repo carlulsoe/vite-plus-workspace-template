@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["apps/website/src/*"],
+      "@vite-plus-workspace-template/core": ["packages/utils/src/index.ts"]
+    },
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "packages/utils/src/**/*.ts",
+    "packages/utils/tests/**/*.ts",
+    "apps/website/src/components/ui/**/*.ts",
+    "apps/website/src/components/ui/**/*.tsx",
+    "apps/website/src/lib/**/*.ts",
+    "apps/website/src/test/**/*.ts",
+    "apps/website/vite.config.ts"
+  ]
+}

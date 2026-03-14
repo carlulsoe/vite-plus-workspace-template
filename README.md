@@ -46,11 +46,18 @@ are installed without needing an interactive TTY.
 
 ## Mutation Testing
 
-Mutation testing is wired up with StrykerJS for the shared package first:
+Mutation testing is wired up with StrykerJS for the shared package and the most important covered UI
+primitives:
 
 ```bash
 vp run mutate
 ```
 
-The initial scope targets `packages/utils/src/**/*.ts` and runs `packages/utils/tests/**/*.ts` so
-the mutation loop stays fast and deterministic while the starter baseline evolves.
+The current scope targets `packages/utils/src/**/*.ts` plus:
+
+- `apps/website/src/components/ui/field.tsx`
+- `apps/website/src/components/ui/card.tsx`
+- `apps/website/src/components/ui/separator.tsx`
+
+It runs the package tests together with the focused primitive tests so the mutation loop stays fast
+and avoids unrelated failures elsewhere in the workspace.

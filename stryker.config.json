@@ -3,8 +3,12 @@
   "plugins": ["@stryker-mutator/typescript-checker"],
   "testRunner": "command",
   "checkers": ["typescript"],
-  "tsconfigFile": "packages/utils/tsconfig.json",
-  "mutate": ["packages/utils/src/**/*.ts"],
+  "tsconfigFile": "tsconfig.stryker.json",
+  "mutate": [
+    "packages/utils/src/**/*.ts",
+    "apps/website/src/lib/*.ts",
+    "apps/website/src/components/*.tsx"
+  ],
   "reporters": ["clear-text", "html", "progress"],
   "coverageAnalysis": "off",
   "incremental": true,
@@ -12,7 +16,7 @@
   "cleanTempDir": "always",
   "concurrency": 2,
   "commandRunner": {
-    "command": "cd packages/utils && vp test"
+    "command": "vp test"
   },
   "typescriptChecker": {
     "prioritizePerformanceOverAccuracy": true

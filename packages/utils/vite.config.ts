@@ -6,5 +6,15 @@ export default defineConfig({
   pack: tsdownConfig,
   test: {
     include: ["tests/**/*.test.ts"],
+    coverage: {
+      include: ["src/**/*.ts"],
+      exclude: [
+        "**/coverage/**",
+        "**/*.config.{js,ts,mjs,mts,cjs,cts}",
+        "**/*.d.ts",
+        "**/*.test.ts",
+        "**/dist/**",
+      ],
+    },
   },
 });

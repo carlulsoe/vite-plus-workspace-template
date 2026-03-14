@@ -74,6 +74,25 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     exclude: ["apps/website/e2e/**", "**/node_modules/**", "**/.git/**"],
+    coverage: {
+      include: [
+        "apps/website/src/**/*.{ts,tsx}",
+        "packages/utils/src/**/*.ts",
+        "tools/create-starter/src/**/*.ts",
+      ],
+      exclude: [
+        "**/coverage/**",
+        "**/*.d.ts",
+        "**/*.test.{ts,tsx}",
+        "**/__tests__/**",
+        "**/dist/**",
+        "**/package.json",
+        "**/*.config.{js,ts,mjs,mts,cjs,cts}",
+        "apps/website/e2e/**",
+        "apps/website/src/routeTree.gen.ts",
+        "apps/website/src/test/**",
+      ],
+    },
   },
   staged: {
     "*": "vp check --fix",

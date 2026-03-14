@@ -12,6 +12,7 @@
   "devDependencies": {
     "@stryker-mutator/core": "catalog:",
     "@stryker-mutator/typescript-checker": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "vite-plus": "catalog:"
   },
   "engines": {

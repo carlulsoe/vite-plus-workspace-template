@@ -28,3 +28,6 @@ dist-ssr
 .stryker-tmp/
 reports/
 stryker-setup-*.js
+
+# Test coverage artifacts
+coverage/
