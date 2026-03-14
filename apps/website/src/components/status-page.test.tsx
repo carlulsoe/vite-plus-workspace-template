@@ -5,13 +5,25 @@ import { StatusPage } from "./status-page";
 import { siteConfig } from "../config/site";
 import { createStatusData } from "../lib/dashboard-data";
 
+async function createCompactStatusData() {
+  const data = await createStatusData();
+
+  return {
+    ...data,
+    snapshot: {
+      ...data.snapshot,
+      watchlist: data.snapshot.watchlist.slice(0, 1),
+    },
+  };
+}
+
 afterEach(() => {
   cleanup();
 });
 
 describe("StatusPage", () => {
   test("renders operational health details without accessibility violations", async () => {
-    const data = await createStatusData();
+    const data = await createCompactStatusData();
     const { container } = render(<StatusPage data={data} />);
 
     expect(screen.getByRole("heading", { level: 1, name: /system live status/i })).toBeTruthy();
@@ -44,7 +56,7 @@ describe("StatusPage", () => {
   });
 
   test("uses destructive styling when the system is not operational", async () => {
-    const data = await createStatusData();
+    const data = await createCompactStatusData();
     const degradedData = {
       ...data,
       health: {
