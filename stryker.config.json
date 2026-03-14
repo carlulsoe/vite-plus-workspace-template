@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "plugins": ["@stryker-mutator/typescript-checker"],
+  "testRunner": "command",
+  "checkers": ["typescript"],
+  "tsconfigFile": "packages/utils/tsconfig.json",
+  "mutate": ["packages/utils/src/**/*.ts"],
+  "reporters": ["clear-text", "html", "progress"],
+  "coverageAnalysis": "off",
+  "incremental": true,
+  "incrementalFile": "reports/mutation/mutation-incremental.json",
+  "cleanTempDir": "always",
+  "concurrency": 2,
+  "commandRunner": {
+    "command": "cd packages/utils && vp test"
+  },
+  "typescriptChecker": {
+    "prioritizePerformanceOverAccuracy": true
+  }
+}

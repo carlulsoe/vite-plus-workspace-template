@@ -29,6 +29,7 @@ underlying Bingo template, not Vite+'s builtin template flags.
 ```bash
 vp run dev
 vp run ready
+vp run mutate
 ```
 
 ## Dev Container
@@ -42,3 +43,14 @@ are installed without needing an interactive TTY.
 - The website lives in `apps/website`.
 - Shared domain logic lives in `packages/utils`, exported as `@vite-plus-workspace-template/core`.
 - The architectural layering note is in `docs/architecture/layering.md`.
+
+## Mutation Testing
+
+Mutation testing is wired up with StrykerJS for the shared package first:
+
+```bash
+vp run mutate
+```
+
+The initial scope targets `packages/utils/src/**/*.ts` and runs `packages/utils/tests/**/*.ts` so
+the mutation loop stays fast and deterministic while the starter baseline evolves.

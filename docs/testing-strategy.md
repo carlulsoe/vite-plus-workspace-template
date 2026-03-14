@@ -10,6 +10,7 @@ below that so most regressions are caught before they need a full browser.
 3. Route and component tests for critical UI state changes.
 4. Accessibility checks for key routes.
 5. Visual regression coverage for the dashboard and status surfaces.
+6. Mutation testing for the shared package.
 
 ## What each layer should cover
 
@@ -28,6 +29,7 @@ Focus:
 - planning-budget rounding and remainder handling
 - profile-specific plan copy
 - health snapshot counts and check contents
+- mutant survival in `packages/utils/src/**/*.ts`
 
 These tests should stay deterministic and avoid rendering UI.
 
@@ -105,6 +107,18 @@ Focus:
 ## Definition of done
 
 - `vp run test -r` passes for workspace packages with tests.
+- `vp run mutate` completes for the shared package baseline.
 - `vp check` passes.
 - New tests cover both success and failure paths for the scenario flow.
 - Playwright stays focused on user journeys, not logic that can be proven faster elsewhere.
+
+## Mutation testing
+
+Run the current mutation target with:
+
+```bash
+vp run mutate
+```
+
+The initial Stryker setup is intentionally scoped to `packages/utils` so mutation runs stay quick
+enough to use while evolving the starter.
