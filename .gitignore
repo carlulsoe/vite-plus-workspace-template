@@ -26,7 +26,8 @@ dist-ssr
 
 # Mutation testing artifacts
 .stryker-tmp/
-reports/
+reports/mutation/mutation.html
+reports/mutation/mutation.json
 stryker-setup-*.js
 
 # Test coverage artifacts

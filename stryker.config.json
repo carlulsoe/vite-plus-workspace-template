@@ -9,17 +9,23 @@
     "!packages/utils/src/**/*.test.ts",
     "apps/website/src/lib/**/*.ts",
     "!apps/website/src/lib/**/*.test.ts",
-    "apps/website/src/components/**/*.tsx",
+    "apps/website/src/components/*.tsx",
     "!apps/website/src/components/**/*.test.tsx"
   ],
-  "reporters": ["clear-text", "html", "progress"],
-  "coverageAnalysis": "off",
+  "reporters": ["html", "progress", "json"],
+  "coverageAnalysis": "perTest",
   "incremental": true,
   "incrementalFile": "reports/mutation/mutation-incremental.json",
   "cleanTempDir": "always",
-  "concurrency": 2,
+  "concurrency": 6,
+  "ignorePatterns": [
+    "apps/website/.output/**",
+    "apps/website/playwright-report/**",
+    "apps/website/test-results/**",
+    "coverage/**"
+  ],
   "commandRunner": {
-    "command": "vp test"
+    "command": "vp test run packages/utils/tests apps/website/src/lib apps/website/src/components"
   },
   "typescriptChecker": {
     "prioritizePerformanceOverAccuracy": true

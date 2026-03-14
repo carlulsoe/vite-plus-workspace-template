@@ -73,7 +73,16 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    exclude: ["apps/website/e2e/**", "**/node_modules/**", "**/.git/**"],
+    exclude: [
+      "apps/website/e2e/**",
+      "apps/website/.output/**",
+      "apps/website/playwright-report/**",
+      "apps/website/test-results/**",
+      ".stryker-tmp/**",
+      "**/.stryker-tmp/**",
+      "**/node_modules/**",
+      "**/.git/**",
+    ],
     coverage: {
       include: [
         "apps/website/src/**/*.{ts,tsx}",
