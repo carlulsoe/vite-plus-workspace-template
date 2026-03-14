@@ -34,7 +34,14 @@ const excludedPaths = [
   "docs/template.md",
 ] as const;
 
-const excludedDirectoryNames = new Set(["coverage", "dist", "playwright-report", "test-results"]);
+const excludedDirectoryNames = new Set([
+  ".output",
+  "coverage",
+  "dist",
+  "node_modules",
+  "playwright-report",
+  "test-results",
+]);
 
 const excludedFileNames = new Set([".DS_Store"]);
 
