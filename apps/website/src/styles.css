@@ -117,15 +117,15 @@
 
 @layer utilities {
   .section-container {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1280px] px-6 sm:px-8 lg:px-12;
   }
 
   .card-section {
-    @apply rounded-[2rem] border border-black/5 bg-white/40 backdrop-blur-md shadow-panel transition-all duration-300 hover:border-black/10 hover:bg-white/50 dark:border-white/5 dark:bg-white/5 dark:hover:border-white/10 dark:hover:bg-white/[0.07];
+    @apply rounded-[2.5rem] border border-black/5 bg-white/40 backdrop-blur-xl shadow-panel transition-all duration-700 hover:border-primary/20 hover:bg-white/60 dark:border-white/5 dark:bg-white/5 dark:hover:border-primary/30 dark:hover:bg-white/[0.08];
   }
 
   .card-nested {
-    @apply rounded-3xl border border-black/5 bg-white/30 backdrop-blur-sm transition-all duration-200 hover:bg-white/50 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10;
+    @apply rounded-[2rem] border border-black/5 bg-white/30 backdrop-blur-md transition-all duration-500 hover:bg-white/50 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10;
   }
 
   .card-positive {
@@ -141,11 +141,11 @@
   }
 
   .badge-section {
-    @apply rounded-full px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-ink-muted bg-black/[0.03] dark:bg-white/[0.03];
+    @apply rounded-full px-4 py-1.5 text-[0.65rem] font-black uppercase tracking-[0.2em] text-ink-muted bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5;
   }
 
   .glass-header {
-    @apply sticky top-0 z-30 border-b border-black/5 bg-background/60 backdrop-blur-xl dark:border-white/5;
+    @apply sticky top-0 z-50 bg-background/60 backdrop-blur-2xl;
   }
 
   .text-ink {
@@ -161,17 +161,17 @@
   }
 
   .reveal-up {
-    animation: reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   @keyframes reveal-up {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px) scale(0.98);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
   }
 
@@ -187,11 +187,34 @@
     background: linear-gradient(135deg, var(--primary), transparent 50%, var(--chart-2));
     border-radius: inherit;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.5s ease;
   }
 
   .glow-border:hover::after {
-    opacity: 0.15;
+    opacity: 0.25;
+  }
+
+  .premium-glow {
+    @apply relative overflow-hidden;
+  }
+
+  .premium-glow::before {
+    content: "";
+    @apply absolute -inset-[100%] bg-[conic-gradient(from_0deg,transparent_0deg,var(--primary)_180deg,transparent_360deg)] opacity-0 transition-opacity duration-1000;
+    animation: rotate-glow 10s linear infinite;
+  }
+
+  .premium-glow:hover::before {
+    @apply opacity-10;
+  }
+
+  @keyframes rotate-glow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 }
 

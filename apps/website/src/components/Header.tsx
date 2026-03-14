@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Cpu, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
@@ -6,37 +7,39 @@ import { cn } from "@/lib/utils";
 
 const navLinkClass = cn(
   buttonVariants({ variant: "ghost", size: "sm" }),
-  "rounded-full px-4 text-sm tracking-[0.02em] text-ink-soft hover:-translate-y-0.5",
+  "rounded-full px-5 text-sm font-semibold tracking-wide text-ink-soft hover:-translate-y-0.5 transition-all duration-300",
 );
 
 const navLinkActiveClass = cn(
   buttonVariants({ variant: "secondary", size: "sm" }),
-  "rounded-full px-4 text-sm tracking-[0.02em] text-ink shadow-sm",
+  "rounded-full px-5 text-sm font-bold tracking-wide text-ink shadow-md bg-white dark:bg-white/10",
 );
 
 export default function Header() {
   return (
-    <header className="glass-header">
-      <div className="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-wrap items-center justify-between gap-4 py-4">
-        <Link to="/" className="inline-flex items-center gap-4 no-underline">
-          <span
-            aria-hidden="true"
-            className="h-4 w-4 rounded-full bg-[radial-gradient(circle_at_30%_30%,#f7d1bf,transparent_35%),linear-gradient(135deg,#c96c3c,#de9a53,#1f7460)] shadow-[0_0_0_6px_rgba(201,108,60,0.12)]"
-          />
-          <span className="grid gap-1">
-            <strong className="block text-base tracking-[0.01em] text-ink">
+    <header className="glass-header border-b-0 shadow-sm">
+      <div className="mx-auto flex w-[min(1280px,calc(100%-4rem))] flex-wrap items-center justify-between gap-6 py-6">
+        <Link to="/" className="inline-flex items-center gap-5 no-underline group">
+          <div className="relative">
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary to-chart-2 rounded-full blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+            <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-chart-3 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500 group-hover:rotate-3">
+              <Cpu className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          <div className="grid gap-1">
+            <strong className="block text-xl tracking-tighter text-ink font-display">
               {siteConfig.name}
             </strong>
             <Badge
               variant="outline"
-              className="rounded-full px-2.5 py-0 text-[0.68rem] tracking-[0.18em] uppercase text-ink-muted"
+              className="rounded-full px-2 py-0 text-[0.6rem] tracking-[0.2em] uppercase text-ink-muted border-primary/20 bg-primary/5 font-black"
             >
               Shared core starter
             </Badge>
-          </span>
+          </div>
         </Link>
 
-        <nav className="flex flex-wrap gap-2" aria-label="Primary">
+        <nav className="flex flex-wrap items-center gap-3" aria-label="Primary">
           <Link to="/" className={navLinkClass} activeProps={{ className: navLinkActiveClass }}>
             Dashboard
           </Link>
@@ -47,16 +50,18 @@ export default function Header() {
           >
             Status
           </Link>
+          <div className="h-4 w-px bg-black/5 dark:bg-white/5 mx-2" />
           <a
             href="/api/health"
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
-              "rounded-full px-4 text-sm tracking-[0.02em]",
+              "rounded-full px-5 text-xs font-black uppercase tracking-widest border-primary/20 hover:bg-primary/5 transition-colors flex items-center gap-2",
             )}
             target="_blank"
             rel="noreferrer"
           >
             API Health
+            <ExternalLink className="h-3 w-3" />
           </a>
         </nav>
       </div>

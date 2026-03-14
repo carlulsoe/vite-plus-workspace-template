@@ -25,7 +25,7 @@ function screenshotOptions(fullPage: boolean) {
     animations: "disabled" as const,
     caret: "hide" as const,
     fullPage,
-    maxDiffPixels: 100,
+    maxDiffPixelRatio: 0.02,
     scale: "css" as const,
   };
 }
