@@ -1,123 +1,106 @@
 # Testing Strategy
 
-This repo now has Playwright end-to-end coverage in progress. The next step is to add faster layers
-below that so most regressions are caught before they need a full browser.
+This repo already covers the starter at several layers. The fastest tests stay close to the shared
+package and the website data boundary, while Playwright covers the routed app surfaces and visual
+baselines.
 
-## Priorities
+## Current Coverage
 
-1. Unit tests for shared planning logic in `packages/utils`.
-2. Integration tests for app-side server functions and API routes in `apps/website`.
-3. Route and component tests for critical UI state changes.
-4. Accessibility checks for key routes.
-5. Visual regression coverage for the dashboard and status surfaces.
-6. Mutation testing for the shared package.
+### 1. Shared package unit tests
 
-## What each layer should cover
+Targets:
 
-### 1. Unit tests
+- `packages/utils/tests/config.test.ts`
+- `packages/utils/tests/repo.test.ts`
+- `packages/utils/tests/service.test.ts`
 
-Target:
+Current assertions:
 
-- `packages/utils/src/service.ts`
-- `packages/utils/src/config.ts`
-- `packages/utils/src/repo.ts`
-
-Focus:
-
-- sorting and selection of top movers
-- timestamp handling
-- planning-budget rounding and remainder handling
+- stable planning copy and rationales
+- curated workspace signal fixtures
+- top-mover sorting and timestamp handling
+- budget allocation totals, rounding, and reserve remainder handling
 - profile-specific plan copy
-- health snapshot counts and check contents
-- mutant survival in `packages/utils/src/**/*.ts`
+- health snapshot counts, labels, and route totals
 
-These tests should stay deterministic and avoid rendering UI.
+### 2. Website data-boundary tests
 
-### 2. Server-function and API integration tests
+Targets:
+
+- `apps/website/src/lib/dashboard.test.ts`
+- `apps/website/src/lib/dashboard-server.test.ts`
+- `apps/website/src/lib/health-response.test.ts`
+
+Current assertions:
+
+- default dashboard and status payload shape
+- scenario input validation and rounding
+- minimum-budget and invalid-profile failures
+- TanStack Start server function wiring and HTTP methods
+- JSON health response headers and payload shape
+
+### 3. Component and accessibility tests
+
+Targets:
+
+- `apps/website/src/components/Header.test.tsx`
+- `apps/website/src/components/Footer.test.tsx`
+- `apps/website/src/components/dashboard-page.test.tsx`
+- `apps/website/src/components/status-page.test.tsx`
+
+Current assertions:
+
+- header and footer navigation/content wiring
+- dashboard success, pending, and error states
+- keyboard flow through the scenario form
+- snapshot-driven rendering on the dashboard and status pages
+- accessibility smoke checks with `vitest-axe`
+
+### 4. End-to-end and visual regression tests
 
 Target:
 
-- `apps/website/src/lib/dashboard.ts`
-- `apps/website/src/routes/api/health.ts`
+- `apps/website/e2e/dashboard.spec.ts`
 
-Focus:
+Current assertions:
 
-- default dashboard payload shape
-- status payload shape
-- scenario validation failures
-- scenario amount normalization
-- health route response headers and JSON structure
+- `/` renders the dashboard shell and default plan
+- `/status` stays reachable from the primary navigation
+- `/api/health` returns the expected status payload
+- screenshot baselines stay stable for dashboard and status pages
+- Playwright runs across `chromium`, `widescreen`, and `mobile` projects
 
-These tests should verify that the website layer stays thin and continues to consume the shared
-package correctly.
+### 5. Mutation testing
 
-### 3. Route and component tests
+Target config:
 
-Target:
+- `stryker.config.json`
 
-- `apps/website/src/routes/index.tsx`
-- `apps/website/src/routes/status.tsx`
+Current mutation scope:
 
-Focus:
+- `packages/utils/src/**/*.ts`
+- `apps/website/src/lib/**/*.ts`
+- `apps/website/src/components/*.tsx`
 
-- initial loader-driven render
-- scenario submit pending state
-- scenario error state
-- updated plan render after a successful submit
-- route-level accessibility landmarks and labels
+## Commands
 
-Do not spend time exhaustively testing generated `components/ui/*` wrappers unless they contain
-project-specific behavior.
-
-### 4. Accessibility tests
-
-Target routes:
-
-- `/`
-- `/status`
-
-Focus:
-
-- axe smoke checks
-- keyboard navigation through the scenario form
-- visible labels and alert semantics
-
-### 5. Visual regression tests
-
-Target pages:
-
-- dashboard
-- status
-
-Focus:
-
-- major layout drift
-- card density and spacing
-- responsive breakpoints
-- destructive alert presentation
-
-## Rollout order
-
-1. Expand `packages/utils` unit coverage.
-2. Add website integration tests around server-side data boundaries.
-3. Add route/component tests for the dashboard form flow.
-4. Add accessibility assertions to route tests.
-5. Add targeted screenshot baselines for the two main pages.
-
-## Definition of done
-
-- `vp run test -r` passes for workspace packages with tests.
-- `vp run mutate` completes for the shared package baseline.
-- `vp check` passes.
-- New tests cover both success and failure paths for the scenario flow.
-- Playwright stays focused on user journeys, not logic that can be proven faster elsewhere.
-
-## Mutation testing
-
-Run the current mutation target with:
+Run the current validation layers with:
 
 ```bash
+vp check
+vp test
+vp run website#e2e
 vp run mutate
+vp run ready
 ```
 
-It currently tests a lot and takes on average 15 min to run.
+`vp run ready` is the closest thing to a full gate at the workspace root. It runs format and lint
+checks, package and website tests, package and website builds, and the Playwright suite.
+
+## What Is Not Covered Yet
+
+- There are no dedicated tests for the root not-found surface yet.
+- The file-route modules themselves are exercised indirectly through loaders, server functions, and
+  Playwright rather than through separate route-module tests.
+- Mutation testing is broader than the original shared-package-only scope and can still take
+  several minutes.

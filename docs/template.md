@@ -14,9 +14,14 @@ What it currently does:
 
 - copies the current monorepo scaffold
 - excludes generated/template-only paths such as `.git`, `node_modules`, `.tanstack`,
-  `.vite-hooks`, `tools/create-starter`, and `apps/website/src/routeTree.gen.ts`
+  `.vite-hooks`, `tools/create-starter`, `apps/website/src/routeTree.gen.ts`, and
+  `docs/template.md`
+- excludes generated output directories such as `.output`, `coverage`, `dist`,
+  `playwright-report`, and `test-results`
 - rewrites `vite-plus-workspace-template`, `Workspace Starter`, and
   `@vite-plus-workspace-template/core`
+- replaces the copied root `README.md` with a generated starter README for the new project name
+- suggests `vp install`, `vp check`, and `vp run dev` after generation
 
 Note: the directory goes after `--` because it is handled by the Bingo generator, not by Vite+'s
 top-level `vp create --directory` option.
@@ -39,6 +44,7 @@ The template baseline is now a generic workspace planning / delivery starter:
 - project slug: `vite-plus-workspace-template`
 - human title: `Workspace Starter`
 - shared package: `@vite-plus-workspace-template/core`
+- website routes: `/`, `/status`, `/api/health`
 
 New template output should inherit that generic baseline and then personalize it through the
 generator options.
