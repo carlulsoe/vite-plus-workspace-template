@@ -1,6 +1,6 @@
 import { constants } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createTemplate } from "bingo";
 import { z } from "zod";
@@ -15,7 +15,14 @@ interface TemplateDirectory {
   [name: string]: TemplateDirectory | string | [string, TemplateFileMetadata];
 }
 
-const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
+function resolveRepoRoot() {
+  try {
+    return fileURLToPath(new URL("../../../", import.meta.url));
+  } catch {
+    // Vitest's module runner doesn't expose a standard file URL here.
+    return resolve(process.cwd(), "../..");
+  }
+}
 
 const excludedPaths = [
   ".git",
@@ -188,7 +195,7 @@ export default createTemplate({
   async produce({ options }) {
     const projectSlug = options.name;
     const projectTitle = options.title ?? toTitleCase(projectSlug);
-    const files = await readTemplateDirectory(repoRoot, "", projectSlug, projectTitle);
+    const files = await readTemplateDirectory(resolveRepoRoot(), "", projectSlug, projectTitle);
     files["README.md"] = createGeneratedReadme(projectTitle, projectSlug);
 
     return {
