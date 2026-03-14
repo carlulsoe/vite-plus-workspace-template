@@ -30,15 +30,22 @@ describe("Card", () => {
 
     expect(card.getAttribute("data-slot")).toBe("card");
     expect(card.getAttribute("data-size")).toBe("default");
+    expect(card.className).toContain("group/card");
+    expect(card.className).toContain("ring-1");
     expect(screen.getByText("Coverage summary").getAttribute("data-slot")).toBe("card-title");
+    expect(screen.getByText("Coverage summary").className).toContain("font-medium");
     expect(screen.getByText("Source-only scope").getAttribute("data-slot")).toBe(
       "card-description",
     );
+    expect(screen.getByText("Source-only scope").className).toContain("text-muted-foreground");
     expect(screen.getByText("Review").getAttribute("data-slot")).toBe("card-action");
+    expect(screen.getByText("Review").className).toContain("justify-self-end");
     expect(screen.getByText("Statement and branch metrics").getAttribute("data-slot")).toBe(
       "card-content",
     );
+    expect(screen.getByText("Statement and branch metrics").className).toContain("px-4");
     expect(screen.getByText("Updated just now").getAttribute("data-slot")).toBe("card-footer");
+    expect(screen.getByText("Updated just now").className).toContain("border-t");
     expect(header.className).toContain("group/card-header");
   });
 

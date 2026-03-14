@@ -6,6 +6,27 @@ import { DashboardPage } from "./dashboard-page";
 import { siteConfig } from "../config/site";
 import { createDashboardData, createScenarioPlan } from "../lib/dashboard-data";
 
+vi.mock("lucide-react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("lucide-react")>();
+  const createIcon = (name: string) => (props: Record<string, unknown>) => (
+    <svg data-icon={name} {...props} />
+  );
+
+  return {
+    ...actual,
+    Activity: createIcon("Activity"),
+    ArrowRight: createIcon("ArrowRight"),
+    BarChart3: createIcon("BarChart3"),
+    ChevronRight: createIcon("ChevronRight"),
+    Cpu: createIcon("Cpu"),
+    Globe: createIcon("Globe"),
+    Layers: createIcon("Layers"),
+    LayoutDashboard: createIcon("LayoutDashboard"),
+    TrendingUp: createIcon("TrendingUp"),
+    Zap: createIcon("Zap"),
+  };
+});
+
 function createDeferredPromise<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error?: unknown) => void;
@@ -18,27 +39,35 @@ function createDeferredPromise<T>() {
   return { promise, resolve, reject };
 }
 
-async function createCompactDashboardData() {
-  const data = await createDashboardData();
+async function createCompactDashboardFixture() {
+  const fullData = await createDashboardData();
 
   return {
-    ...data,
-    defaultPlan: {
-      ...data.defaultPlan,
-      slices: data.defaultPlan.slices.slice(0, 2),
-    },
-    health: {
-      ...data.health,
-      checks: data.health.checks.slice(0, 1),
-    },
-    snapshot: {
-      ...data.snapshot,
-      movers: data.snapshot.movers.slice(0, 1),
-      scorecard: data.snapshot.scorecard.slice(0, 1),
-      deliveryNotes: data.snapshot.deliveryNotes.slice(0, 1),
-      watchlist: data.snapshot.watchlist.slice(0, 1),
+    fullData,
+    data: {
+      ...fullData,
+      defaultPlan: {
+        ...fullData.defaultPlan,
+        slices: fullData.defaultPlan.slices.slice(0, 2),
+      },
+      health: {
+        ...fullData.health,
+        checks: fullData.health.checks.slice(0, 1),
+      },
+      snapshot: {
+        ...fullData.snapshot,
+        movers: fullData.snapshot.movers.slice(0, 1),
+        scorecard: fullData.snapshot.scorecard.slice(0, 1),
+        deliveryNotes: fullData.snapshot.deliveryNotes.slice(0, 1),
+        watchlist: fullData.snapshot.watchlist.slice(0, 1),
+      },
     },
   };
+}
+
+async function createCompactDashboardData() {
+  const { data } = await createCompactDashboardFixture();
+  return data;
 }
 
 async function createCompactScenarioPlan(input: Parameters<typeof createScenarioPlan>[0]) {
@@ -87,7 +116,7 @@ afterEach(() => {
 
 describe("DashboardPage", () => {
   test("renders the loader-backed dashboard view without accessibility violations", async () => {
-    const data = await createCompactDashboardData();
+    const { data, fullData } = await createCompactDashboardFixture();
     const { container } = renderDashboard(data);
 
     expect(
@@ -95,6 +124,11 @@ describe("DashboardPage", () => {
     ).toBeTruthy();
     expect(screen.getByRole("heading", { level: 2, name: /budget scenario/i })).toBeTruthy();
     expect(screen.getByLabelText("Delivery profile")).toBeTruthy();
+    expect(screen.getAllByText("24h Change")).toHaveLength(data.snapshot.movers.length);
+    expect(screen.queryByText(`"${fullData.snapshot.movers[1]?.note ?? ""}"`)).toBeNull();
+    expect(screen.queryByText(fullData.snapshot.scorecard[1]?.label ?? "")).toBeNull();
+    expect(screen.queryByText(fullData.snapshot.deliveryNotes[1]?.title ?? "")).toBeNull();
+    expect(screen.queryByText(fullData.snapshot.watchlist[1]?.label ?? "")).toBeNull();
     expect((await axe(container)).violations).toHaveLength(0);
   });
 
@@ -111,6 +145,10 @@ describe("DashboardPage", () => {
 
     setScenarioProfile("acceleration");
     setScenarioAmount("300000");
+
+    expect(screen.getByLabelText("Delivery profile")).toHaveProperty("value", "acceleration");
+    expect(screen.getByLabelText("Planning budget")).toHaveProperty("value", "300000");
+
     submitScenario();
 
     await screen.findByText(nextPlan.headline);
@@ -126,6 +164,31 @@ describe("DashboardPage", () => {
       "value",
       String(nextPlan.totalBudget),
     );
+    expect(screen.getAllByText("Allocation")).toHaveLength(nextPlan.slices.length);
+    expect(screen.queryByText(data.defaultPlan.headline)).toBeNull();
+  });
+
+  test("updates the recommendation after a successful scenario run without invalidation", async () => {
+    const data = await createCompactDashboardData();
+    const nextPlan = await createCompactScenarioPlan({
+      profile: "steady",
+      amount: 100_000,
+    });
+    const runScenario = vi.fn().mockResolvedValue(nextPlan);
+
+    renderDashboard(data, runScenario);
+
+    setScenarioProfile("steady");
+    setScenarioAmount("100000");
+    submitScenario();
+
+    await screen.findByText(nextPlan.headline);
+
+    expect(runScenario).toHaveBeenCalledWith({
+      profile: "steady",
+      amount: 100_000,
+    });
+    expect(screen.getByText(nextPlan.expectedRange)).toBeTruthy();
   });
 
   test("shows pending feedback while recomputing", async () => {
@@ -173,6 +236,7 @@ describe("DashboardPage", () => {
     const alert = await screen.findByRole("alert");
 
     expect(alert.textContent).toContain("Unable to recompute the scenario.");
+    expect(alert.textContent).not.toContain("network unavailable");
   });
 
   test("supports keyboard navigation through the scenario form", async () => {
@@ -232,5 +296,84 @@ describe("DashboardPage", () => {
       expect(screen.getByText(note.title)).toBeTruthy();
       expect(screen.getByText(note.copy)).toBeTruthy();
     }
+  });
+
+  test("maps tone, change direction, and footer icon visuals from the payload", async () => {
+    const data = await createDashboardData();
+    const positiveWatch = data.snapshot.watchlist.find((instrument) => instrument.dayChangePct > 0);
+    const negativeWatch = data.snapshot.watchlist.find((instrument) => instrument.dayChangePct < 0);
+
+    expect(positiveWatch).toBeTruthy();
+    expect(negativeWatch).toBeTruthy();
+
+    const customData = {
+      ...data,
+      snapshot: {
+        ...data.snapshot,
+        movers: [positiveWatch!, negativeWatch!],
+        scorecard: [
+          ...data.snapshot.scorecard,
+          {
+            label: "Incident Load",
+            value: "High",
+            tone: "negative" as const,
+            detail: "Escalations are rising faster than automation can absorb them.",
+          },
+        ],
+      },
+    };
+
+    const { container } = renderDashboard(customData);
+    const positiveScorecard = screen.getByText("Delivery Confidence").closest("[data-slot='card']");
+    const steadyScorecard = screen.getByText("Platform Health").closest("[data-slot='card']");
+    const negativeScorecard = screen.getByText("Incident Load").closest("[data-slot='card']");
+    const positiveMoverCard = screen
+      .getByText(`"${positiveWatch!.note}"`)
+      .closest("[data-slot='card']");
+    const negativeMoverCard = screen
+      .getByText(`"${negativeWatch!.note}"`)
+      .closest("[data-slot='card']");
+    const positiveWatchRow = screen.getAllByText(positiveWatch!.label)[1]?.closest("div.group");
+    const negativeWatchRow = screen.getAllByText(negativeWatch!.label)[1]?.closest("div.group");
+    const positiveWatchPill = positiveWatchRow?.querySelector("div.inline-flex");
+    const negativeWatchPill = negativeWatchRow?.querySelector("div.inline-flex");
+
+    expect(positiveScorecard?.className).toContain("card-positive");
+    expect(
+      positiveScorecard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
+    ).toContain("text-emerald-500/40");
+    expect(steadyScorecard?.className).toContain("card-steady");
+    expect(
+      steadyScorecard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
+    ).toContain("text-sky-500/40");
+    expect(negativeScorecard?.className).toContain("card-negative");
+    expect(
+      negativeScorecard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
+    ).toContain("text-destructive/40");
+
+    expect(positiveMoverCard?.querySelector("svg[data-icon='TrendingUp']")).toBeTruthy();
+    expect(
+      positiveMoverCard?.querySelector("[class*='text-emerald-600'], [class*='text-emerald-400']"),
+    ).toBeTruthy();
+    expect(
+      negativeMoverCard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),
+    ).toContain("rotate-180");
+    expect(negativeMoverCard?.querySelector("[class*='text-destructive']")).toBeTruthy();
+
+    expect(positiveWatchPill?.textContent).toContain("↑");
+    expect(positiveWatchPill?.className).toContain("text-emerald-600");
+    expect(negativeWatchPill?.textContent).toContain("↓");
+    expect(negativeWatchPill?.className).toContain("text-destructive");
+
+    for (const [index, note] of siteConfig.stackNotes.entries()) {
+      const footerCard = screen.getByText(note.title).closest("[data-slot='card']");
+      const iconName = index === 0 ? "Layers" : index === 1 ? "Cpu" : "Globe";
+
+      expect(footerCard?.querySelector(`svg[data-icon='${iconName}']`)).toBeTruthy();
+    }
+
+    expect(container.querySelectorAll("svg[data-icon='ArrowRight']")).toHaveLength(
+      siteConfig.stackNotes.length,
+    );
   });
 });

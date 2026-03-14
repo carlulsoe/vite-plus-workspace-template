@@ -1,4 +1,4 @@
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vite-plus/test";
 
 import {
@@ -43,30 +43,41 @@ describe("Field primitives", () => {
     const legend = container.querySelector('[data-slot="field-legend"]');
     const group = container.querySelector('[data-slot="field-group"]');
     const field = container.querySelector('[data-slot="field"]');
-    const label = container.querySelector('[data-slot="field-label"]');
-    const title = container.querySelector(".field-title");
+    const label = screen.getByText("Rollout window").closest("label");
+    const title = screen.getByText("Rollout window");
     const content = container.querySelector('[data-slot="field-content"]');
     const description = container.querySelector('[data-slot="field-description"]');
 
     expect(fieldSet?.className).toContain("field-set");
+    expect(fieldSet?.className).toContain("flex-col");
     expect(legend?.getAttribute("data-variant")).toBe("label");
+    expect(legend?.className).toContain("font-medium");
     expect(group?.className).toContain("field-group");
+    expect(group?.className).toContain("group/field-group");
     expect(field?.getAttribute("data-slot")).toBe("field");
     expect(field?.getAttribute("data-orientation")).toBe("responsive");
     expect(field?.className).toContain("field-root");
+    expect(field?.className).toContain("@md/field-group:flex-row");
     expect(label?.className).toContain("field-label");
+    expect(label?.className).toContain("peer/field-label");
     expect(title?.textContent).toBe("Rollout window");
+    expect(title?.className).toContain("text-xs/relaxed");
     expect(content?.className).toContain("field-content");
+    expect(content?.className).toContain("group/field-content");
     expect(description?.textContent).toContain("Choose when the change can ship.");
+    expect(description?.className).toContain("text-muted-foreground");
   });
 
   test("renders separator content only when children are provided", () => {
     const { container, rerender } = render(<FieldSeparator className="plain-separator" />);
 
     const emptySeparator = container.querySelector('[data-slot="field-separator"]');
+    const emptySeparatorRule = container.querySelector('[data-slot="separator"]');
 
     expect(emptySeparator?.getAttribute("data-content")).toBe("false");
     expect(emptySeparator?.className).toContain("plain-separator");
+    expect(emptySeparator?.className).toContain("relative");
+    expect(emptySeparatorRule?.className).toContain("top-1/2");
     expect(container.querySelector('[data-slot="field-separator-content"]')).toBeNull();
 
     rerender(<FieldSeparator className="labeled-separator">Optional settings</FieldSeparator>);
@@ -79,7 +90,11 @@ describe("Field primitives", () => {
   });
 
   test("renders no error output when there is no content", () => {
-    const { container } = render(<FieldError className="field-error" />);
+    const { container, rerender } = render(<FieldError className="field-error" />);
+
+    expect(container.firstChild).toBeNull();
+
+    rerender(<FieldError errors={[undefined]} />);
 
     expect(container.firstChild).toBeNull();
   });
@@ -94,7 +109,9 @@ describe("Field primitives", () => {
 
     const error = container.querySelector('[data-slot="field-error"]');
 
+    expect(error?.getAttribute("role")).toBe("alert");
     expect(error?.className).toContain("field-error");
+    expect(error?.className).toContain("text-destructive");
     expect(error?.textContent).toBe("A title is required.");
     expect(container.querySelectorAll("li")).toHaveLength(0);
   });
@@ -115,18 +132,22 @@ describe("Field primitives", () => {
     const items = Array.from(error?.querySelectorAll("li") ?? []).map((item) => item.textContent);
 
     expect(error).toBeTruthy();
+    expect(error?.getAttribute("role")).toBe("alert");
+    expect(error?.querySelector("ul")).toBeTruthy();
     expect(items).toEqual(["Name is required.", "Name must be at least 3 characters."]);
   });
 
   test("prefers explicit children over derived errors", () => {
     const { container } = render(
-      <FieldError errors={[{ message: "Derived error" }]}>
+      <FieldError id="explicit-error" errors={[{ message: "Derived error" }]}>
         <span>Explicit content</span>
       </FieldError>,
     );
 
     const error = container.querySelector('[data-slot="field-error"]');
 
+    expect(error?.getAttribute("id")).toBe("explicit-error");
+    expect(error?.getAttribute("role")).toBe("alert");
     expect(error?.textContent).toContain("Explicit content");
     expect(error?.textContent).not.toContain("Derived error");
   });

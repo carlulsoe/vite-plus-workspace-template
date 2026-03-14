@@ -26,18 +26,28 @@ describe("Header", () => {
   test("renders the brand, primary navigation, and external API link", () => {
     render(<Header />);
 
-    expect(screen.getByText(siteConfig.name)).toBeTruthy();
+    const header = screen.getByRole("banner");
+    const brandLink = screen.getByRole("link", { name: new RegExp(siteConfig.name, "i") });
     expect(screen.getByText("Shared core starter")).toBeTruthy();
 
     const dashboardLink = screen.getByRole("link", { name: "Dashboard" });
     const statusLink = screen.getByRole("link", { name: "Status" });
     const apiHealthLink = screen.getByRole("link", { name: /api health/i });
 
+    expect(header.className).toContain("glass-header");
+    expect(brandLink.getAttribute("href")).toBe("/");
+    expect(brandLink.className).toContain("group");
     expect(dashboardLink.getAttribute("href")).toBe("/");
     expect(dashboardLink.getAttribute("data-active-class")).toContain("rounded-full");
+    expect(dashboardLink.className).toContain("group/button");
+    expect(dashboardLink.className).toContain("tracking-wide");
     expect(statusLink.getAttribute("href")).toBe("/status");
+    expect(statusLink.getAttribute("data-active-class")).toContain("shadow-md");
+    expect(statusLink.className).toContain("text-ink-soft");
     expect(apiHealthLink.getAttribute("href")).toBe("/api/health");
     expect(apiHealthLink.getAttribute("target")).toBe("_blank");
     expect(apiHealthLink.getAttribute("rel")).toBe("noreferrer");
+    expect(apiHealthLink.className).toContain("uppercase");
+    expect(apiHealthLink.className).toContain("border-primary/20");
   });
 });
