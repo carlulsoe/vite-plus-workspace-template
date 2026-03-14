@@ -25,7 +25,25 @@ describe("workspace services", () => {
     expect(allocated).toBe(2_500_000);
     expect(plan.slices[0]?.focusArea).toBe("Foundation");
     expect(plan.profile).toBe("balanced");
+    expect(plan.headline).toBe("Balanced roadmap across product, platform, and growth");
     expect(plan.expectedRange).toBe("Expected coordination load: moderate");
+  });
+
+  test("delivery plan uses profile-specific headlines and ranges", () => {
+    const steadyPlan = createDeliveryPlan({
+      profile: "steady",
+      budget: 750_000,
+    });
+    const accelerationPlan = createDeliveryPlan({
+      profile: "acceleration",
+      budget: 750_000,
+    });
+
+    expect(steadyPlan.headline).toBe("Steady delivery plan with protected platform work");
+    expect(steadyPlan.expectedRange).toBe("Expected coordination load: low to moderate");
+
+    expect(accelerationPlan.headline).toBe("Acceleration plan with core operations protected");
+    expect(accelerationPlan.expectedRange).toBe("Expected coordination load: moderate to high");
   });
 
   test("delivery plan assigns any rounding remainder to the final slice", () => {
@@ -50,5 +68,30 @@ describe("workspace services", () => {
     expect(health.routeCount).toBe(3);
     expect(health.checks).toHaveLength(3);
     expect(health.checkedAt).toBe("2026-03-13T08:00:00.000Z");
+  });
+
+  test("health snapshot exposes the expected check labels and details", () => {
+    const health = createHealthSnapshot();
+
+    expect(health.packageCount).toBe(1);
+    expect(health.checks).toEqual([
+      {
+        label: "Core package",
+        detail:
+          "Shared signals and planning services resolve from the workspace package entrypoint.",
+        state: "pass",
+      },
+      {
+        label: "Nitro API",
+        detail: "The /api/health route can serialize status without touching app UI state.",
+        state: "pass",
+      },
+      {
+        label: "Route shape",
+        detail:
+          "Dashboard and status pages load through TanStack Start file routes and server functions.",
+        state: "pass",
+      },
+    ]);
   });
 });
