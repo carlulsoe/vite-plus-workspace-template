@@ -8,6 +8,41 @@ import { defineConfig } from "vite-plus";
 const isVitest = process.env.VITEST === "true";
 
 export default defineConfig({
+  run: {
+    tasks: {
+      test: {
+        command: "vp test",
+        input: [
+          { auto: true },
+          "!.output/**",
+          "!node_modules/.vite/**",
+          "!playwright-report/**",
+          "!test-results/**",
+        ],
+      },
+      build: {
+        command: "./node_modules/.bin/tsgo && vp build",
+        input: [
+          { auto: true },
+          "!.output/**",
+          "!node_modules/.vite/**",
+          "!playwright-report/**",
+          "!test-results/**",
+        ],
+      },
+      e2e: {
+        command: "./node_modules/.bin/playwright test",
+        dependsOn: ["build"],
+        input: [
+          { auto: true },
+          "!.output/**",
+          "!node_modules/.vite/**",
+          "!playwright-report/**",
+          "!test-results/**",
+        ],
+      },
+    },
+  },
   fmt: {
     ignorePatterns: ["src/routeTree.gen.ts"],
   },

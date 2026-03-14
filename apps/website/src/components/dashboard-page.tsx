@@ -48,15 +48,13 @@ export interface DashboardPageProps {
 export function DashboardPage({ data, invalidate, runScenario }: DashboardPageProps) {
   const { defaultPlan, health, snapshot } = data;
   const [plan, setPlan] = useState<DeliveryPlan>(defaultPlan);
+  const [profile, setProfile] = useState<PlanningProfile>(defaultPlan.profile);
+  const [amountInput, setAmountInput] = useState(() => String(defaultPlan.totalBudget));
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  function handleSubmit(formData: FormData) {
-    const rawProfile = formData.get("profile");
-    const rawAmount = formData.get("amount");
-    const profile = typeof rawProfile === "string" ? (rawProfile as PlanningProfile) : "balanced";
-    const amount = typeof rawAmount === "string" ? Number(rawAmount) : 0;
-
+  function handleSubmit() {
+    const amount = Number(amountInput);
     setError(null);
     setPending(true);
 
@@ -64,6 +62,8 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
       void runScenario({ profile, amount })
         .then((nextPlan) => {
           setPlan(nextPlan);
+          setProfile(nextPlan.profile);
+          setAmountInput(String(nextPlan.totalBudget));
           return invalidate?.();
         })
         .catch((caughtError) => {
@@ -210,7 +210,7 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                   className="p-8 rounded-[2.5rem] bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5 shadow-inner backdrop-blur-sm"
                   onSubmit={(event) => {
                     event.preventDefault();
-                    handleSubmit(new FormData(event.currentTarget));
+                    handleSubmit();
                   }}
                 >
                   <FieldGroup className="grid gap-8 lg:grid-cols-3 lg:items-end">
@@ -226,7 +226,10 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                         <NativeSelect
                           id="profile"
                           name="profile"
-                          defaultValue={plan.profile}
+                          value={profile}
+                          onChange={(event) => {
+                            setProfile(event.target.value as PlanningProfile);
+                          }}
                           className="w-full h-12 bg-white/50 dark:bg-white/5"
                         >
                           <NativeSelectOption value="steady">Steady</NativeSelectOption>
@@ -251,7 +254,10 @@ export function DashboardPage({ data, invalidate, runScenario }: DashboardPagePr
                           type="number"
                           min="100000"
                           step="50000"
-                          defaultValue={plan.totalBudget}
+                          value={amountInput}
+                          onChange={(event) => {
+                            setAmountInput(event.target.value);
+                          }}
                           className="h-12 bg-white/50 dark:bg-white/5"
                         />
                       </FieldContent>

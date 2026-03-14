@@ -5,10 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
-    "build": "tsgo && vp build",
-    "preview": "vp preview",
-    "e2e": "playwright test",
-    "test": "vp test"
+    "preview": "vp preview"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
