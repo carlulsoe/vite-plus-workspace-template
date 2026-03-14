@@ -4,15 +4,15 @@ import { siteConfig } from "@/config/site";
 
 export default function Footer() {
   return (
-    <footer className="pb-8 pt-4">
-      <div className="mx-auto w-[min(1120px,calc(100%-2rem))]">
-        <Separator className="bg-black/8" />
-        <div className="flex flex-col justify-between gap-3 py-4 text-sm text-ink-soft sm:flex-row sm:items-center">
-          <p className="m-0">{siteConfig.description}</p>
-          <Badge
-            variant="outline"
-            className="rounded-full px-3 py-1 text-[0.68rem] uppercase tracking-[0.16em] text-ink-muted"
-          >
+    <footer className="pb-12 pt-8 reveal-up [animation-delay:600ms]">
+      <div className="section-container">
+        <Separator className="bg-black/5 dark:bg-white/5" />
+        <div className="flex flex-col justify-between gap-6 py-8 text-sm text-ink-soft sm:flex-row sm:items-center">
+          <div className="space-y-1">
+            <p className="font-bold text-ink">{siteConfig.name}</p>
+            <p className="m-0 text-ink-muted">{siteConfig.description}</p>
+          </div>
+          <Badge variant="outline" className="badge-section w-fit">
             {siteConfig.footerTagline}
           </Badge>
         </div>

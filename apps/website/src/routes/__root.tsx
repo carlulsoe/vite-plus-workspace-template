@@ -39,7 +39,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body className="text-foreground antialiased">
-        <div className="page-backdrop" aria-hidden="true" />
+        <div className="grid-overlay" aria-hidden="true" />
         <Header />
         {children}
         <Footer />

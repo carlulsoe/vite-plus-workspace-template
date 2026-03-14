@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { siteConfig } from "@/config/site";
 import type { StatusData } from "@/lib/dashboard-data";
 import { cn } from "@/lib/utils";
@@ -11,147 +10,159 @@ export interface StatusPageProps {
 
 export function StatusPage({ data }: StatusPageProps) {
   const { health, snapshot } = data;
-  const healthBadgeClass = cn(
-    "rounded-full px-4 py-2 text-[0.82rem] font-extrabold uppercase tracking-[0.08em]",
-    health.status.toLowerCase() === "operational"
-      ? "border-emerald-700/20 bg-emerald-500/10 text-emerald-900"
-      : "border-destructive/20 bg-destructive/10 text-destructive",
-  );
+  const isOperational = health.status.toLowerCase() === "operational";
 
   return (
-    <main className="mx-auto w-[min(1120px,calc(100%-2rem))] py-8 pb-16">
-      <Card className="rounded-[1.7rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,244,236,0.94))] py-0 shadow-panel">
-        <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Badge
-              variant="outline"
-              className="rounded-full px-3 py-1 text-[0.68rem] uppercase tracking-[0.18em] text-ink-muted"
+    <main className="section-container py-12 pb-24">
+      {/* Page Header */}
+      <section className="reveal-up">
+        <Card className="card-section border-0 bg-primary/5 dark:bg-primary/10 shadow-2xl overflow-hidden">
+          <CardContent className="flex flex-col gap-8 p-8 sm:p-12 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-4">
+              <Badge variant="outline" className="badge-section">
+                Operational view
+              </Badge>
+              <h1 className="text-5xl leading-[0.95] sm:text-7xl lg:text-8xl">
+                System <span className="text-primary italic">Live</span> Status.
+              </h1>
+              <p className="max-w-2xl text-lg text-ink-soft">
+                Real-time monitoring of shared package logic, Nitro-backed routes, and core domain
+                service health.
+              </p>
+            </div>
+
+            <div
+              className={cn(
+                "flex flex-col items-center justify-center p-8 rounded-[2.5rem] border-4 aspect-square min-w-[200px] transition-all duration-500",
+                isOperational
+                  ? "bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_40px_rgba(16,185,129,0.1)]"
+                  : "bg-destructive/10 border-destructive/20 shadow-[0_0_40px_rgba(224,108,77,0.1)]",
+              )}
             >
-              Operational view
-            </Badge>
-            <h1 className="mt-3 font-display text-5xl leading-[0.92] tracking-[-0.04em] text-ink sm:text-7xl">
-              Thin routes, shared package logic, live health surface.
-            </h1>
-          </div>
-          <Badge variant="outline" className={healthBadgeClass}>
-            {health.status}
-          </Badge>
-        </CardContent>
-      </Card>
-
-      <section className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)]">
-        <Card className="rounded-[1.7rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,244,236,0.94))] py-0 shadow-panel">
-          <CardHeader className="px-6 pt-6 sm:px-6 sm:pt-6">
-            <div>
-              <Badge
-                variant="outline"
-                className="rounded-full px-3 py-1 text-[0.68rem] uppercase tracking-[0.18em] text-ink-muted"
+              <div
+                className={cn(
+                  "h-4 w-4 rounded-full mb-4 animate-pulse",
+                  isOperational
+                    ? "bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                    : "bg-destructive shadow-[0_0_15px_rgba(224,108,77,0.5)]",
+                )}
+              />
+              <strong
+                className={cn(
+                  "text-2xl font-black uppercase tracking-widest",
+                  isOperational ? "text-emerald-600 dark:text-emerald-400" : "text-destructive",
+                )}
               >
-                Checks
-              </Badge>
-              <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-                Runtime signals
-              </h2>
+                {health.status}
+              </strong>
+              <p className="text-[0.65rem] font-bold text-ink-muted uppercase tracking-widest mt-1">
+                Status
+              </p>
             </div>
-            <CardAction className="text-sm font-semibold text-ink-muted">
-              {health.checkedAt}
-            </CardAction>
-          </CardHeader>
-          <CardContent className="grid gap-3 px-6 pb-6">
-            {health.checks.map((check) => (
-              <Card
-                key={check.label}
-                size="sm"
-                className="rounded-[1.15rem] border border-black/10 bg-white/55 py-0"
-              >
-                <CardContent className="px-4 py-4">
-                  <strong className="text-base text-ink">{check.label}</strong>
-                  <p className="mt-2 text-sm leading-7 text-ink-soft">{check.detail}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-[1.7rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,244,236,0.94))] py-0 shadow-panel">
-          <CardHeader className="px-6 pt-6 sm:px-6 sm:pt-6">
-            <div>
-              <Badge
-                variant="outline"
-                className="rounded-full px-3 py-1 text-[0.68rem] uppercase tracking-[0.18em] text-ink-muted"
-              >
-                Architecture
-              </Badge>
-              <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-                Imported patterns
-              </h2>
-            </div>
-            <CardAction className="text-sm font-semibold text-ink-muted">
-              From local reference repos
-            </CardAction>
-          </CardHeader>
-          <CardContent className="grid gap-3 px-6 pb-6">
-            {siteConfig.operatingPrinciples.map((principle) => (
-              <Card
-                key={principle}
-                size="sm"
-                className="rounded-[1.3rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,244,236,0.94))] py-0 shadow-panel"
-              >
-                <CardContent className="px-5 py-5">
-                  <Badge
-                    variant="outline"
-                    className="rounded-full px-2.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-[#8c3f19]"
-                  >
-                    Principle
-                  </Badge>
-                  <p className="mt-3 text-sm leading-7 text-ink-soft">{principle}</p>
-                </CardContent>
-              </Card>
-            ))}
           </CardContent>
         </Card>
       </section>
 
-      <Card className="mt-5 rounded-[1.7rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,244,236,0.94))] py-0 shadow-panel">
-        <CardHeader className="px-6 pt-6 sm:px-6 sm:pt-6">
-          <div>
-            <Badge
-              variant="outline"
-              className="rounded-full px-3 py-1 text-[0.68rem] uppercase tracking-[0.18em] text-ink-muted"
-            >
-              Signal footprint
-            </Badge>
-            <h2 className="mt-2 font-display text-3xl leading-none tracking-[-0.03em] text-ink">
-              Current core snapshot
-            </h2>
-          </div>
-          <CardAction className="text-sm font-semibold text-ink-muted">
-            {snapshot.watchlist.length} signals
-          </CardAction>
-        </CardHeader>
-        <CardContent className="grid gap-3 px-6 pb-6">
-          {snapshot.watchlist.map((instrument, index) => (
-            <div key={instrument.id}>
-              {index > 0 ? <Separator className="mb-3 bg-black/8" /> : null}
-              <div className="flex flex-col gap-3 rounded-[1.15rem] border border-black/10 bg-white/55 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <strong className="text-base text-ink">{instrument.label}</strong>
-                  <p className="mt-1 text-sm leading-7 text-ink-soft">{instrument.note}</p>
-                </div>
-                <div className="grid gap-1 sm:justify-items-end sm:text-right">
-                  <Badge
-                    variant="outline"
-                    className="justify-self-start rounded-full px-2.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-ink-muted sm:justify-self-end"
-                  >
-                    {instrument.symbol}
-                  </Badge>
-                  <strong className="text-ink">{instrument.signal}</strong>
-                </div>
-              </div>
+      <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_400px]">
+        {/* Runtime Signals */}
+        <section className="reveal-up [animation-delay:100ms] space-y-6">
+          <div className="flex items-end justify-between px-2">
+            <div className="space-y-1">
+              <Badge variant="outline" className="badge-section">
+                Diagnostics
+              </Badge>
+              <h2 className="text-4xl">Runtime signals</h2>
             </div>
-          ))}
-        </CardContent>
-      </Card>
+            <p className="text-xs font-bold text-ink-muted uppercase tracking-widest">
+              Last check: {health.checkedAt}
+            </p>
+          </div>
+
+          <div className="grid gap-4">
+            {health.checks.map((check) => (
+              <Card
+                key={check.label}
+                className="card-nested hover:shadow-xl transition-all duration-300"
+              >
+                <CardContent className="p-6 flex items-start gap-6">
+                  <div className="h-12 w-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] flex items-center justify-center shrink-0">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                  </div>
+                  <div className="space-y-1">
+                    <strong className="text-xl text-ink">{check.label}</strong>
+                    <p className="text-sm leading-relaxed text-ink-soft">{check.detail}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Sidebar */}
+        <aside className="space-y-8">
+          <section className="reveal-up [animation-delay:200ms] space-y-4">
+            <div className="px-2">
+              <Badge variant="outline" className="badge-section">
+                Architecture
+              </Badge>
+              <h2 className="text-3xl mt-1">Imported patterns</h2>
+            </div>
+
+            <div className="space-y-4">
+              {siteConfig.operatingPrinciples.map((principle) => (
+                <Card
+                  key={principle}
+                  size="sm"
+                  className="card-section border-0 bg-black/[0.02] dark:bg-white/[0.02]"
+                >
+                  <CardContent className="p-6 space-y-4">
+                    <Badge
+                      variant="outline"
+                      className="badge-section border-primary/20 text-primary bg-primary/5"
+                    >
+                      Principle
+                    </Badge>
+                    <p className="text-base font-bold leading-relaxed text-ink-soft italic">
+                      "{principle}"
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          <section className="reveal-up [animation-delay:300ms]">
+            <Card className="card-section border-0 shadow-2xl">
+              <CardHeader className="p-8 pb-0">
+                <div className="space-y-1">
+                  <Badge variant="outline" className="badge-section">
+                    Footprint
+                  </Badge>
+                  <h2 className="text-2xl">Signal core snapshot</h2>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-2">
+                  {snapshot.watchlist.map((instrument) => (
+                    <div
+                      key={instrument.id}
+                      className="flex items-center justify-between p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5"
+                    >
+                      <div>
+                        <p className="text-sm font-bold text-ink">{instrument.label}</p>
+                        <p className="text-xs text-ink-muted">{instrument.symbol}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-black text-ink">{instrument.signal}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        </aside>
+      </div>
     </main>
   );
 }

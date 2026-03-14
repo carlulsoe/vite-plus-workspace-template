@@ -28,7 +28,9 @@ describe("DashboardPage", () => {
       <DashboardPage data={data} runScenario={(input) => createScenarioPlan(input)} />,
     );
 
-    expect(screen.getByRole("heading", { level: 1, name: /real domain model/i })).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { level: 1, name: /future of workspace models/i }),
+    ).toBeTruthy();
     expect(screen.getByRole("heading", { level: 2, name: /budget scenario/i })).toBeTruthy();
     expect(screen.getByLabelText("Delivery profile")).toBeTruthy();
     expect((await axe(container)).violations).toHaveLength(0);

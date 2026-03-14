@@ -16,7 +16,7 @@ const navLinkActiveClass = cn(
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-20 border-b border-black/8 bg-[rgba(242,238,230,0.78)] backdrop-blur-xl">
+    <header className="glass-header">
       <div className="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-wrap items-center justify-between gap-4 py-4">
         <Link to="/" className="inline-flex items-center gap-4 no-underline">
           <span

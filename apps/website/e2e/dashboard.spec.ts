@@ -1,6 +1,40 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const isoTimestamp = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/;
+const screenshotStyle = `
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  body::before,
+  body::after,
+  .grid-overlay {
+    display: none !important;
+  }
+`;
+
+function screenshotOptions(page: Page, fullPage: boolean) {
+  return {
+    animations: "disabled" as const,
+    caret: "hide" as const,
+    fullPage,
+    maxDiffPixels: 100,
+    mask: [page.getByText(isoTimestamp)],
+    scale: "css" as const,
+  };
+}
+
+async function expectScreenshot(page: Page, name: string, fullPage: boolean) {
+  await page.addStyleTag({ content: screenshotStyle });
+  await expect(page).toHaveScreenshot(name, screenshotOptions(page, fullPage));
+}
 
 test("dashboard renders the primary starter surfaces", async ({ page }) => {
   await page.goto("/");
@@ -8,7 +42,7 @@ test("dashboard renders the primary starter surfaces", async ({ page }) => {
   await expect(page).toHaveTitle("Workspace Starter");
   await expect(
     page.getByRole("heading", {
-      name: "A starter dashboard with a real domain model.",
+      name: "The future of workspace models.",
     }),
   ).toBeVisible();
 
@@ -33,7 +67,7 @@ test("status page and health endpoint stay reachable", async ({ page, request })
   await expect(page).toHaveURL(/\/status$/);
   await expect(
     page.getByRole("heading", {
-      name: "Thin routes, shared package logic, live health surface.",
+      name: "System Live Status.",
     }),
   ).toBeVisible();
   await expect(page.getByText("operational", { exact: true })).toBeVisible();
@@ -57,21 +91,23 @@ test("status page and health endpoint stay reachable", async ({ page, request })
 test("dashboard visual layout stays stable", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator("main")).toHaveScreenshot("dashboard-page.png", {
-    animations: "disabled",
-    caret: "hide",
-    maxDiffPixels: 100,
-    mask: [page.getByText(isoTimestamp)],
-  });
+  await expectScreenshot(page, "dashboard-page.png", false);
+});
+
+test("dashboard full-page layout stays stable", async ({ page }) => {
+  await page.goto("/");
+
+  await expectScreenshot(page, "dashboard-page-full.png", true);
 });
 
 test("status visual layout stays stable", async ({ page }) => {
   await page.goto("/status");
 
-  await expect(page.locator("main")).toHaveScreenshot("status-page.png", {
-    animations: "disabled",
-    caret: "hide",
-    maxDiffPixels: 100,
-    mask: [page.getByText(isoTimestamp)],
-  });
+  await expectScreenshot(page, "status-page.png", false);
+});
+
+test("status full-page layout stays stable", async ({ page }) => {
+  await page.goto("/status");
+
+  await expectScreenshot(page, "status-page-full.png", true);
 });
