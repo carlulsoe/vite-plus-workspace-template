@@ -20,20 +20,30 @@ const screenshotStyle = `
   }
 `;
 
-function screenshotOptions(page: Page, fullPage: boolean) {
+function screenshotOptions(fullPage: boolean) {
   return {
     animations: "disabled" as const,
     caret: "hide" as const,
     fullPage,
     maxDiffPixels: 100,
-    mask: [page.getByText(isoTimestamp)],
     scale: "css" as const,
   };
 }
 
+async function normalizeTimestamps(page: Page) {
+  await page.getByText(isoTimestamp).evaluateAll((elements) => {
+    for (const element of elements) {
+      if (element instanceof HTMLElement) {
+        element.style.visibility = "hidden";
+      }
+    }
+  });
+}
+
 async function expectScreenshot(page: Page, name: string, fullPage: boolean) {
   await page.addStyleTag({ content: screenshotStyle });
-  await expect(page).toHaveScreenshot(name, screenshotOptions(page, fullPage));
+  await normalizeTimestamps(page);
+  await expect(page).toHaveScreenshot(name, screenshotOptions(fullPage));
 }
 
 test("dashboard renders the primary starter surfaces", async ({ page }) => {
