@@ -1,4 +1,4 @@
-import { constants } from "node:fs";
+import { accessSync, constants } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,11 +16,30 @@ interface TemplateDirectory {
 }
 
 function resolveRepoRoot() {
-  try {
-    return fileURLToPath(new URL("../../../", import.meta.url));
-  } catch {
-    // Vitest's module runner doesn't expose a standard file URL here.
-    return resolve(process.cwd(), "../..");
+  if (typeof import.meta.url === "string") {
+    try {
+      return fileURLToPath(new URL("../../../", import.meta.url));
+    } catch {
+      // Fall through to a workspace-root search when the module runner uses a non-file URL.
+    }
+  }
+
+  let currentDirectory = resolve(process.cwd());
+
+  while (true) {
+    try {
+      accessSync(join(currentDirectory, "pnpm-workspace.yaml"));
+      accessSync(join(currentDirectory, "tools/create-starter/package.json"));
+      return currentDirectory;
+    } catch {
+      const parentDirectory = resolve(currentDirectory, "..");
+
+      if (parentDirectory === currentDirectory) {
+        return resolve(process.cwd());
+      }
+
+      currentDirectory = parentDirectory;
+    }
   }
 }
 

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import { DashboardPage } from "./dashboard-page";
+import { siteConfig } from "../config/site";
 import { createDashboardData, createScenarioPlan } from "../lib/dashboard-data";
 
 function createDeferredPromise<T>() {
@@ -61,6 +62,11 @@ describe("DashboardPage", () => {
     });
     expect(invalidate).toHaveBeenCalledTimes(1);
     expect(screen.getByText(nextPlan.expectedRange)).toBeTruthy();
+    expect(screen.getByLabelText("Delivery profile")).toHaveProperty("value", nextPlan.profile);
+    expect(screen.getByLabelText("Planning budget")).toHaveProperty(
+      "value",
+      String(nextPlan.totalBudget),
+    );
   });
 
   test("shows pending feedback while recomputing", async () => {
@@ -107,6 +113,21 @@ describe("DashboardPage", () => {
     expect(alert.textContent).toContain("Scenario service unavailable.");
   });
 
+  test("falls back to a generic error for non-Error failures", async () => {
+    const user = userEvent.setup();
+    const data = await createDashboardData();
+
+    render(
+      <DashboardPage data={data} runScenario={vi.fn().mockRejectedValue("network unavailable")} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /run scenario/i }));
+
+    const alert = await screen.findByRole("alert");
+
+    expect(alert.textContent).toContain("Unable to recompute the scenario.");
+  });
+
   test("supports keyboard navigation through the scenario form", async () => {
     const user = userEvent.setup();
     const data = await createDashboardData();
@@ -125,5 +146,51 @@ describe("DashboardPage", () => {
 
     await user.tab();
     expect(document.activeElement).toBe(submit);
+  });
+
+  test("renders snapshot-driven content from the dashboard payload", async () => {
+    const data = await createDashboardData();
+
+    render(<DashboardPage data={data} runScenario={(input) => createScenarioPlan(input)} />);
+
+    expect(screen.getByText(data.health.boundaryMode)).toBeTruthy();
+    expect(screen.getByText(data.snapshot.generatedAt)).toBeTruthy();
+
+    for (const badge of siteConfig.badges) {
+      expect(screen.getByText(badge)).toBeTruthy();
+    }
+
+    for (const mover of data.snapshot.movers) {
+      expect(screen.getAllByText(mover.label).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(mover.symbol).length).toBeGreaterThan(0);
+      expect(screen.getByText(`"${mover.note}"`)).toBeTruthy();
+    }
+
+    for (const item of data.snapshot.scorecard) {
+      expect(screen.getByText(item.label)).toBeTruthy();
+      expect(screen.getByText(item.value)).toBeTruthy();
+    }
+
+    for (const note of data.snapshot.deliveryNotes) {
+      expect(screen.getByText(note.title)).toBeTruthy();
+      expect(screen.getByText(note.summary)).toBeTruthy();
+      expect(screen.getByText(note.stance)).toBeTruthy();
+    }
+
+    for (const instrument of data.snapshot.watchlist) {
+      expect(screen.getAllByText(instrument.label).length).toBeGreaterThan(0);
+      expect(
+        screen.getByText(
+          (content) =>
+            content.includes(instrument.symbol) && content.includes(instrument.focusArea),
+        ),
+      ).toBeTruthy();
+      expect(screen.getByText(instrument.value.toFixed(1))).toBeTruthy();
+    }
+
+    for (const note of siteConfig.stackNotes) {
+      expect(screen.getByText(note.title)).toBeTruthy();
+      expect(screen.getByText(note.copy)).toBeTruthy();
+    }
   });
 });
