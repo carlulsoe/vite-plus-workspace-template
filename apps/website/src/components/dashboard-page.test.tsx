@@ -302,6 +302,9 @@ describe("DashboardPage", () => {
     expect(screen.getAllByText(mover.symbol).length).toBeGreaterThan(0);
     expect(screen.getByText(`"${mover.note}"`)).toBeTruthy();
     expect(moverCard?.textContent).toContain(`${percentFormatter.format(mover.dayChangePct)}%`);
+    expect(moverCard?.textContent).not.toContain(
+      `+${percentFormatter.format(mover.dayChangePct)}%`,
+    );
 
     const scorecardItem = data.snapshot.scorecard[0];
     expect(screen.getByText(scorecardItem.label)).toBeTruthy();
@@ -408,7 +411,10 @@ describe("DashboardPage", () => {
     expect(
       positiveMoverCard?.querySelector("[class*='text-emerald-600'], [class*='text-emerald-400']"),
     ).toBeTruthy();
-    expect(positiveMoverCard?.textContent).toContain(`+${positiveMoverChange}`);
+    expect(positiveMoverCard?.textContent).toContain(positiveMoverChange);
+    expect(positiveMoverCard?.textContent).not.toContain(
+      `++${positiveWatch!.dayChangePct.toFixed(1)}%`,
+    );
     expect(positiveMoverCard?.querySelector("[class*='bg-emerald-500']")).toBeTruthy();
     expect(
       negativeMoverCard?.querySelector("svg[data-icon='Activity']")?.getAttribute("class"),

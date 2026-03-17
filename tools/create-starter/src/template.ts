@@ -7,12 +7,18 @@ import { z } from "zod";
 
 import pkgJson from "../package.json" with { type: "json" };
 
+type TemplateFileContents = string | Uint8Array;
+
 type TemplateFileMetadata = {
   executable?: boolean;
 };
 
 interface TemplateDirectory {
-  [name: string]: TemplateDirectory | string | [string, TemplateFileMetadata];
+  [name: string]:
+    | TemplateDirectory
+    | TemplateFileContents
+    | [TemplateFileContents]
+    | [TemplateFileContents, TemplateFileMetadata];
 }
 
 function resolveRepoRoot() {
@@ -188,19 +194,20 @@ async function readTemplateDirectory(
       continue;
     }
 
-    if (!isTextFile(entry.name)) {
+    const fileStats = await stat(entryAbsolutePath);
+    const executable = Boolean(fileStats.mode & constants.S_IXUSR);
+
+    if (isTextFile(entry.name)) {
+      const contents = await readFile(entryAbsolutePath, "utf8");
+      const replacedContents = replaceTemplateTokens(contents, projectSlug, projectTitle);
+
+      output[entry.name] = executable ? [replacedContents, { executable: true }] : replacedContents;
       continue;
     }
 
-    const [contents, fileStats] = await Promise.all([
-      readFile(entryAbsolutePath, "utf8"),
-      stat(entryAbsolutePath),
-    ]);
+    const binaryContents = await readFile(entryAbsolutePath);
 
-    const replacedContents = replaceTemplateTokens(contents, projectSlug, projectTitle);
-    const executable = Boolean(fileStats.mode & constants.S_IXUSR);
-
-    output[entry.name] = executable ? [replacedContents, { executable: true }] : replacedContents;
+    output[entry.name] = executable ? [binaryContents, { executable: true }] : [binaryContents];
   }
 
   return output;
@@ -225,7 +232,7 @@ export default createTemplate({
     files["README.md"] = createGeneratedReadme(projectTitle, projectSlug);
 
     return {
-      files,
+      files: files as never,
       suggestions: ["vp install", "vp check", "vp run dev"],
     };
   },

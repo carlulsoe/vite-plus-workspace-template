@@ -1,126 +1,144 @@
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vite-plus";
+import { defineConfig, type UserConfig } from "vite-plus";
+import { createWebsiteAppConfig } from "./apps/website/vite.shared.ts";
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./apps/website/src", import.meta.url)),
-    },
-  },
-  run: {
-    cache: {
-      scripts: true,
-    },
-    tasks: {
-      ready: {
-        command: "echo 'Everything is ready!'",
-        cache: false,
-        dependsOn: ["ready:e2e"],
-      },
-      "ready:fmt": {
-        command: "vp fmt",
-        input: [
-          { auto: true },
-          "!apps/website/.output/**",
-          "!apps/website/playwright-report/**",
-          "!apps/website/test-results/**",
-        ],
-      },
-      "ready:lint": {
-        command: "vp lint",
-        dependsOn: ["ready:fmt"],
-        input: [
-          { auto: true },
-          "!apps/website/.output/**",
-          "!apps/website/playwright-report/**",
-          "!apps/website/test-results/**",
-        ],
-      },
-      "ready:core-test": {
-        command: "vp test",
-        cwd: "packages/utils",
-        dependsOn: ["ready:lint"],
-      },
-      "ready:website-test": {
-        command: "vp test",
-        cwd: "apps/website",
-        dependsOn: ["ready:lint"],
-        input: [{ auto: true }, "!.output/**", "!playwright-report/**", "!test-results/**"],
-      },
-      "ready:starter-test": {
-        command: "vp test",
-        cwd: "tools/create-starter",
-        dependsOn: ["ready:lint"],
-      },
-      "ready:core-build": {
-        command: "vp pack",
-        cwd: "packages/utils",
-        dependsOn: ["ready:core-test", "ready:starter-test", "ready:website-test"],
-      },
-      "ready:website-build": {
-        command: "./node_modules/.bin/tsgo && vp build",
-        cwd: "apps/website",
-        dependsOn: ["ready:core-test", "ready:starter-test", "ready:website-test"],
-        input: [{ auto: true }, "!.output/**", "!playwright-report/**", "!test-results/**"],
-      },
-      "ready:e2e": {
-        command: "./node_modules/.bin/playwright test",
-        cwd: "apps/website",
-        dependsOn: ["ready:core-build", "ready:website-build"],
-        input: [{ auto: true }, "!.output/**", "!playwright-report/**", "!test-results/**"],
+export function createWorkspaceConfig(): UserConfig {
+  return {
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./apps/website/src", import.meta.url)),
       },
     },
-  },
-  test: {
-    environment: "jsdom",
-    exclude: [
-      "apps/website/e2e/**",
-      "apps/website/.output/**",
-      "apps/website/playwright-report/**",
-      "apps/website/test-results/**",
-      ".stryker-tmp/**",
-      "**/.stryker-tmp/**",
-      "**/node_modules/**",
-      "**/.git/**",
-    ],
-    coverage: {
-      include: [
-        "apps/website/src/**/*.{ts,tsx}",
-        "packages/utils/src/**/*.ts",
-        "tools/create-starter/src/**/*.ts",
-      ],
+    run: {
+      cache: {
+        scripts: true,
+      },
+      tasks: {
+        ready: {
+          command: "echo 'Everything is ready!'",
+          cache: false,
+          dependsOn: ["ready:e2e"],
+        },
+        "ready:fmt": {
+          command: "vp fmt",
+          input: [
+            { auto: true },
+            "!apps/website/.output/**",
+            "!apps/website/playwright-report/**",
+            "!apps/website/test-results/**",
+          ],
+        },
+        "ready:lint": {
+          command: "vp lint",
+          dependsOn: ["ready:fmt"],
+          input: [
+            { auto: true },
+            "!apps/website/.output/**",
+            "!apps/website/playwright-report/**",
+            "!apps/website/test-results/**",
+          ],
+        },
+        "ready:core-test": {
+          command: "vp test",
+          cwd: "packages/utils",
+          dependsOn: ["ready:lint"],
+        },
+        "ready:website-test": {
+          command: "vp test",
+          cwd: "apps/website",
+          dependsOn: ["ready:lint"],
+          input: [{ auto: true }, "!.output/**", "!playwright-report/**", "!test-results/**"],
+        },
+        "ready:starter-test": {
+          command: "vp test",
+          cwd: "tools/create-starter",
+          dependsOn: ["ready:lint"],
+        },
+        "ready:core-build": {
+          command: "vp pack",
+          cwd: "packages/utils",
+          dependsOn: ["ready:core-test", "ready:starter-test", "ready:website-test"],
+        },
+        "ready:website-build": {
+          command: "./node_modules/.bin/tsgo && vp build",
+          cwd: "apps/website",
+          dependsOn: ["ready:core-test", "ready:starter-test", "ready:website-test"],
+          input: [{ auto: true }, "!.output/**", "!playwright-report/**", "!test-results/**"],
+        },
+        "ready:e2e": {
+          command: "./node_modules/.bin/playwright test",
+          cwd: "apps/website",
+          dependsOn: ["ready:core-build", "ready:website-build"],
+          input: [{ auto: true }, "!.output/**", "!playwright-report/**", "!test-results/**"],
+        },
+      },
+    },
+    test: {
+      environment: "jsdom",
       exclude: [
-        "**/coverage/**",
-        "**/*.d.ts",
-        "**/*.test.{ts,tsx}",
-        "**/__tests__/**",
-        "**/dist/**",
-        "**/package.json",
-        "**/*.config.{js,ts,mjs,mts,cjs,cts}",
         "apps/website/e2e/**",
-        "apps/website/src/routeTree.gen.ts",
-        "apps/website/src/test/**",
+        "apps/website/.output/**",
+        "apps/website/playwright-report/**",
+        "apps/website/test-results/**",
+        ".stryker-tmp/**",
+        "**/.stryker-tmp/**",
+        "**/node_modules/**",
+        "**/.git/**",
+      ],
+      coverage: {
+        include: [
+          "apps/website/src/**/*.{ts,tsx}",
+          "packages/utils/src/**/*.ts",
+          "tools/create-starter/src/**/*.ts",
+        ],
+        exclude: [
+          "**/coverage/**",
+          "**/*.d.ts",
+          "**/*.test.{ts,tsx}",
+          "**/__tests__/**",
+          "**/dist/**",
+          "**/package.json",
+          "**/*.config.{js,ts,mjs,mts,cjs,cts}",
+          "apps/website/e2e/**",
+          "apps/website/src/routeTree.gen.ts",
+          "apps/website/src/test/**",
+        ],
+      },
+    },
+    staged: {
+      "*": "vp check --fix",
+    },
+    fmt: {
+      ignorePatterns: ["apps/website/src/routeTree.gen.ts"],
+    },
+    lint: {
+      ignorePatterns: ["apps/website/src/routeTree.gen.ts"],
+      options: { typeAware: true, typeCheck: true },
+      plugins: [
+        "eslint",
+        "typescript",
+        "unicorn",
+        "oxc",
+        "react",
+        "react-perf",
+        "jsx-a11y",
+        "vitest",
       ],
     },
-  },
-  staged: {
-    "*": "vp check --fix",
-  },
-  fmt: {
-    ignorePatterns: ["apps/website/src/routeTree.gen.ts"],
-  },
-  lint: {
-    ignorePatterns: ["apps/website/src/routeTree.gen.ts"],
-    options: { typeAware: true, typeCheck: true },
-    plugins: [
-      "eslint",
-      "typescript",
-      "unicorn",
-      "oxc",
-      "react",
-      "react-perf",
-      "jsx-a11y",
-      "vitest",
-    ],
-  },
-});
+  };
+}
+
+export function createRootConfig(command = process.argv[2]): UserConfig {
+  const workspaceConfig = createWorkspaceConfig();
+
+  if (command !== "build" && command !== "dev" && command !== "preview") {
+    return workspaceConfig;
+  }
+
+  return {
+    ...workspaceConfig,
+    ...createWebsiteAppConfig({ useWorkspaceRoot: true }),
+  };
+}
+
+export default defineConfig(createRootConfig());

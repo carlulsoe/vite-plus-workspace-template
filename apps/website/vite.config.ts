@@ -1,13 +1,8 @@
-import { fileURLToPath, URL } from "node:url";
-import tailwindcss from "@tailwindcss/vite";
-import viteReact from "@vitejs/plugin-react";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import { nitro } from "nitro/vite";
 import { defineConfig } from "vite-plus";
-
-const isVitest = process.env.VITEST === "true";
+import { createWebsiteAppConfig } from "./vite.shared.ts";
 
 export default defineConfig({
+  ...createWebsiteAppConfig(),
   run: {
     tasks: {
       test: {
@@ -49,14 +44,6 @@ export default defineConfig({
   lint: {
     ignorePatterns: ["src/routeTree.gen.ts"],
   },
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@vite-plus-workspace-template/core": fileURLToPath(
-        new URL("../../packages/utils/src/index.ts", import.meta.url),
-      ),
-    },
-  },
   test: {
     environment: "jsdom",
     exclude: ["e2e/**", "**/node_modules/**", "**/.git/**"],
@@ -74,5 +61,4 @@ export default defineConfig({
       ],
     },
   },
-  plugins: isVitest ? [viteReact()] : [nitro(), tailwindcss(), tanstackStart(), viteReact()],
 });

@@ -15,6 +15,15 @@ function expectStringFile(value: unknown) {
   return value;
 }
 
+function expectBinaryFile(value: unknown) {
+  const fileEntry = value as [Uint8Array];
+
+  expect(Array.isArray(value)).toBe(true);
+  expect(ArrayBuffer.isView(fileEntry[0])).toBe(true);
+
+  return fileEntry[0];
+}
+
 function expectDirectory(value: unknown) {
   expect(value).toBeTruthy();
   expect(typeof value).toBe("object");
@@ -62,6 +71,16 @@ describe("create-starter template", () => {
     const appPackageJson = expectStringFile(websiteDirectory["package.json"]);
     expect(appPackageJson).toContain('"name": "website"');
     expect(appPackageJson).toContain('"@acme-workspace/core": "workspace:*"');
+    const srcDirectory = expectDirectory(websiteDirectory["src"]);
+    const assetsDirectory = expectDirectory(srcDirectory["assets"]);
+    expect(expectBinaryFile(assetsDirectory["hero.png"]).byteLength).toBeGreaterThan(0);
+    expect(expectStringFile(assetsDirectory["typescript.svg"])).toContain("<svg");
+
+    const e2eDirectory = expectDirectory(websiteDirectory["e2e"]);
+    const snapshotsDirectory = expectDirectory(e2eDirectory["dashboard.spec.ts-snapshots"]);
+    expect(
+      expectBinaryFile(snapshotsDirectory["dashboard-page-chromium-linux.png"]).byteLength,
+    ).toBeGreaterThan(0);
 
     const packagesDirectory = expectDirectory(files?.["packages"]);
     const utilsDirectory = expectDirectory(packagesDirectory["utils"]);

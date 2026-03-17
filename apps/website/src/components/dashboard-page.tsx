@@ -570,7 +570,6 @@ function MoverCard({ instrument }: { instrument: WorkspaceSignal }) {
                   <Activity className="h-5 w-5 rotate-180" />
                 )}
                 <span className="text-3xl font-display font-black leading-none tracking-tighter">
-                  {isPositive ? "+" : ""}
                   {percentFormatter.format(instrument.dayChangePct)}%
                 </span>
               </div>
