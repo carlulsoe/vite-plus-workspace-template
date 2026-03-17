@@ -112,5 +112,15 @@ export default defineConfig({
   lint: {
     ignorePatterns: ["apps/website/src/routeTree.gen.ts"],
     options: { typeAware: true, typeCheck: true },
+    plugins: [
+      "eslint",
+      "typescript",
+      "unicorn",
+      "oxc",
+      "react",
+      "react-perf",
+      "jsx-a11y",
+      "vitest",
+    ],
   },
 });
