@@ -95,7 +95,8 @@ vp run ready
 ```
 
 `vp run ready` is the closest thing to a full gate at the workspace root. It runs format and lint
-checks, package and website tests, package and website builds, and the Playwright suite.
+checks, package and website tests with coverage thresholds, package and website builds, and the
+Playwright suite.
 
 ## What Is Not Covered Yet
 

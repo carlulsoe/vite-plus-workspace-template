@@ -49,7 +49,7 @@ export default defineConfig({
     exclude: ["e2e/**", "**/node_modules/**", "**/.git/**"],
     setupFiles: "./src/test/setup.ts",
     coverage: {
-      include: ["src/**/*.{ts,tsx}"],
+      include: ["src/components/*.tsx", "src/config/**/*.ts", "src/lib/**/*.{ts,tsx}"],
       exclude: [
         "**/coverage/**",
         "**/*.config.{js,ts,mjs,mts,cjs,cts}",
@@ -59,6 +59,12 @@ export default defineConfig({
         "src/routeTree.gen.ts",
         "src/test/**",
       ],
+      thresholds: {
+        statements: 100,
+        branches: 90,
+        functions: 100,
+        lines: 100,
+      },
     },
   },
 });

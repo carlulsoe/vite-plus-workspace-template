@@ -39,18 +39,18 @@ export function createWorkspaceConfig(): UserConfig {
           ],
         },
         "ready:core-test": {
-          command: "vp test",
+          command: "vp test --coverage",
           cwd: "packages/utils",
           dependsOn: ["ready:lint"],
         },
         "ready:website-test": {
-          command: "vp test",
+          command: "vp test --coverage",
           cwd: "apps/website",
           dependsOn: ["ready:lint"],
           input: [{ auto: true }, "!.output/**", "!playwright-report/**", "!test-results/**"],
         },
         "ready:starter-test": {
-          command: "vp test",
+          command: "vp test --coverage",
           cwd: "tools/create-starter",
           dependsOn: ["ready:lint"],
         },
@@ -86,6 +86,7 @@ export function createWorkspaceConfig(): UserConfig {
         "**/.git/**",
       ],
       coverage: {
+        provider: "v8",
         include: [
           "apps/website/src/**/*.{ts,tsx}",
           "packages/utils/src/**/*.ts",

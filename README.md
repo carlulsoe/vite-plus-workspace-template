@@ -53,7 +53,7 @@ vp run mutate
 ```
 
 `vp run ready` is the full root validation pipeline. It runs format and lint checks, package and
-website tests, package and website builds, and the Playwright suite.
+website tests with coverage thresholds, package and website builds, and the Playwright suite.
 
 ## Dev Container
 
